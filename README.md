@@ -5,10 +5,18 @@
 Here are some ideas to get you started:
 -->
 
-## 🔭 I’m currently working on Back-end development
-## 🌱 I’m currently learning SwiftUI
-## 👯 I’m looking to collaborate on Freakin Coder
-## 🤔 I’m looking for help with making money
-## 💬 Ask me about Rock N' Roll 🎸 
-## 📫 How to reach me: [@maoyidan](https://twitter.com/maoyidan)
+## 💻 I’m currently working on 
 
+- Back-end development
+- iOS development
+- Android development
+- Rock N' Roll 🎸
+
+## 🧐 I’m currently learning 
+
+- SwiftUI
+- Make money (I'm Chinese)
+
+## 📫 How to reach me
+
+- Twitter: [@maoyidan](https://twitter.com/maoyidan)
