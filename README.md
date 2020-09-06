@@ -15,7 +15,7 @@ Here are some ideas to get you started:
 ## 🧐 I’m currently learning 
 
 - SwiftUI
-- Make money (I'm Chinese)
+- Make money
 
 ## 📫 How to reach me
 
