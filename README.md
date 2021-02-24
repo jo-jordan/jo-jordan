@@ -14,9 +14,10 @@ Here are some ideas to get you started:
 
 ## 🧐 I’m currently learning 
 
-- SwiftUI
-- Make money
+- 6.S081
+- kotlin
+- Stock Market
 
 ## 📫 How to reach me
 
-- Twitter: [@lzjlxebr](https://twitter.com/maoyidan)
+- Twitter: [@lzjlxebr](https://twitter.com/lzjlxebr)
