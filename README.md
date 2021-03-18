@@ -14,7 +14,7 @@ Here are some ideas to get you started:
 
 ## 🧐 I’m currently learning 
 
-- (6.S081)[https://pdos.csail.mit.edu/6.S081/2020/schedule.html]
+- [6.S081](https://pdos.csail.mit.edu/6.S081/2020/schedule.html)
 - kotlin
 - Stock Market
 
