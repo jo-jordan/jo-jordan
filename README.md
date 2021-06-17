@@ -7,16 +7,13 @@ Here are some ideas to get you started:
 
 ## 💻 I’m currently working on 
 
-- Back-end development
-- iOS development
-- Android development
+- Implements a websocket server using C
 - Rock N' Roll 🎸
 
 ## 🧐 I’m currently learning 
 
+- C & System
 - [6.S081](https://pdos.csail.mit.edu/6.S081/2020/schedule.html)
-- kotlin
-- Stock Market
 
 ## 📫 How to reach me
 
