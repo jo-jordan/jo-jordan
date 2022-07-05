@@ -7,12 +7,12 @@ Here are some ideas to get you started:
 
 ## 💻 I’m currently working on 
 
-- Implements a websocket server using C
+- Implements an Unity Game
 - Rock N' Roll 🎸
 
 ## 🧐 I’m currently learning 
 
-- C & System
+- Unity3D
 - [6.S081](https://pdos.csail.mit.edu/6.S081/2020/schedule.html)
 
 ## 📫 How to reach me
