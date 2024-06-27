@@ -15,6 +15,5 @@ Here are some ideas to get you started:
 - Godot Engine
 - Gaming Network
 
-## 📫 How to reach me
-
-- Twitter: [@surprisenewman](https://twitter.com/surprisenewman)
+## How long?
+![Top Langs](https://github-readme-stats-pied-six-29.vercel.app/api/top-langs/?username=jo-jordan&layout=compact&card_width=300&theme=radical&hide=scss,css,html&langs_count=16&count_private=true&exclude_repo=github-readme-stats)
