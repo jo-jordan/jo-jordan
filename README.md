@@ -46,7 +46,7 @@ func _ready() -> void:
   <a href="https://github.com/jo-jordan/Holdem"><img width="49%" alt="Holdem" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/pin-Holdem.svg" /></a>
   <a href="https://github.com/jo-jordan/go-holdem"><img width="49%" alt="go-holdem" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/pin-go-holdem.svg" /></a>
   <a href="https://github.com/jo-jordan/super-holdem-server"><img width="49%" alt="super-holdem-server" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/pin-super-holdem-server.svg" /></a>
-  <a href="https://github.com/jo-jordan/let_me_say"><img width="49%" alt="let_me_say" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/pin-let_me_say.svg" /></a>
+  <a href="https://github.com/jo-jordan/websocket_server"><img width="49%" alt="websocket_server" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/pin-websocket_server.svg" /></a>
 </p>
 
 ## `~/stats`

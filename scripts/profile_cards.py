@@ -15,7 +15,7 @@ import sys
 import urllib.request
 from collections import defaultdict
 
-PINS = ["Holdem", "go-holdem", "super-holdem-server", "let_me_say"]
+PINS = ["Holdem", "go-holdem", "super-holdem-server", "websocket_server"]
 # Shown instead of the repo description when the repo has none.
 PIN_BLURBS = {"Holdem": "Texas Hold'em built with the Godot Engine."}
 EXCLUDE_LANGS = {"HTML", "CSS", "SCSS"}
@@ -153,11 +153,11 @@ def svg(w, h, body, label):
   .v {{ font-size: 13px; font-weight: 600; fill: {FG}; font-variant-numeric: tabular-nums; }}
   .s {{ font-size: 12px; fill: {FAINT}; }}
   .m {{ font: 600 10.5px {MONO}; fill: {FAINT}; letter-spacing: .1em; }}
-  .in {{ opacity: 0; animation: in .6s ease-out forwards; }}
+  .in {{ animation: in .6s ease-out backwards; }}
   @keyframes in {{ from {{ opacity: 0; transform: translateY(4px); }} to {{ opacity: 1; transform: none; }} }}
-  .draw {{ stroke-dasharray: 2400; stroke-dashoffset: 2400; animation: draw 2s ease-out .3s forwards; }}
-  @keyframes draw {{ to {{ stroke-dashoffset: 0; }} }}
-  @media (prefers-reduced-motion: reduce) {{ .in, .draw {{ animation: none; opacity: 1; stroke-dashoffset: 0; }} }}
+  .draw {{ animation: draw 2s ease-out .3s backwards; }}
+  @keyframes draw {{ from {{ stroke-dasharray: 2400; stroke-dashoffset: 2400; }} to {{ stroke-dasharray: 2400; stroke-dashoffset: 0; }} }}
+  @media (prefers-reduced-motion: reduce) {{ .in, .draw {{ animation: none; }} }}
 </style>
 <rect x=".5" y=".5" width="{w - 1}" height="{h - 1}" rx="10" fill="{BG}" stroke="{BORDER}"/>
 {body}
@@ -179,7 +179,7 @@ def stats_card(d):
         ("Commits", d["commits"], BLUE),
         ("Pull requests", d["prs"], VIOLET),
         ("Issues", d["issues"], CYAN),
-        ("Contributed to", d["contributed_to"], GREEN),
+        ("Repositories", len(d["repos"]), GREEN),
     ]
     body = [f'<text class="eb" x="24" y="34">GITHUB STATS</text>',
             f'<text class="t" x="24" y="54">{esc(d["name"])}</text>']
@@ -352,6 +352,8 @@ def render_all(d, out):
     for name in PINS:
         if name in by_name:
             files[f"pin-{name}.svg"] = pin_card(by_name[name])
+        else:
+            print(f"warning: pinned repo {name!r} not found (private, renamed or a fork?)", file=sys.stderr)
     for fn, content in files.items():
         with open(os.path.join(out, fn), "w", encoding="utf-8") as f:
             f.write(content)
