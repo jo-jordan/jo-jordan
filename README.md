@@ -96,13 +96,6 @@ func _ready() -> void:
   </picture>
 </p>
 
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/github-snake-dark.svg" />
-    <img width="100%" alt="Snake eating the contribution grid" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/github-snake.svg" />
-  </picture>
-</p>
-
 <!-- Footer -->
 <p align="center">
   <img width="100%" alt="" src="https://capsule-render.vercel.app/api?type=waving&section=footer&height=110&color=0:16161e,40:2a2342,75:7a4a6b,100:e0af68" />
