@@ -43,56 +43,31 @@ func _ready() -> void:
 ## `~/featured`
 
 <p align="center">
-  <a href="https://github.com/jo-jordan/Holdem">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats-pied-six-29.vercel.app/api/pin/?username=jo-jordan&repo=Holdem&theme=tokyonight&hide_border=true&border_radius=6" />
-      <img width="49%" alt="Holdem" src="https://github-readme-stats-pied-six-29.vercel.app/api/pin/?username=jo-jordan&repo=Holdem&border_color=d1d9e0&border_radius=6" />
-    </picture>
-  </a>
-  <a href="https://github.com/jo-jordan/go-holdem">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats-pied-six-29.vercel.app/api/pin/?username=jo-jordan&repo=go-holdem&theme=tokyonight&hide_border=true&border_radius=6" />
-      <img width="49%" alt="go-holdem" src="https://github-readme-stats-pied-six-29.vercel.app/api/pin/?username=jo-jordan&repo=go-holdem&border_color=d1d9e0&border_radius=6" />
-    </picture>
-  </a>
-  <a href="https://github.com/jo-jordan/super-holdem-server">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats-pied-six-29.vercel.app/api/pin/?username=jo-jordan&repo=super-holdem-server&theme=tokyonight&hide_border=true&border_radius=6" />
-      <img width="49%" alt="super-holdem-server" src="https://github-readme-stats-pied-six-29.vercel.app/api/pin/?username=jo-jordan&repo=super-holdem-server&border_color=d1d9e0&border_radius=6" />
-    </picture>
-  </a>
-  <a href="https://github.com/jo-jordan/let_me_say">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats-pied-six-29.vercel.app/api/pin/?username=jo-jordan&repo=let_me_say&theme=tokyonight&hide_border=true&border_radius=6" />
-      <img width="49%" alt="let_me_say" src="https://github-readme-stats-pied-six-29.vercel.app/api/pin/?username=jo-jordan&repo=let_me_say&border_color=d1d9e0&border_radius=6" />
-    </picture>
-  </a>
+  <a href="https://github.com/jo-jordan/Holdem"><img width="49%" alt="Holdem" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/pin-Holdem.svg" /></a>
+  <a href="https://github.com/jo-jordan/go-holdem"><img width="49%" alt="go-holdem" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/pin-go-holdem.svg" /></a>
+  <a href="https://github.com/jo-jordan/super-holdem-server"><img width="49%" alt="super-holdem-server" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/pin-super-holdem-server.svg" /></a>
+  <a href="https://github.com/jo-jordan/let_me_say"><img width="49%" alt="let_me_say" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/pin-let_me_say.svg" /></a>
 </p>
 
 ## `~/stats`
 
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats-pied-six-29.vercel.app/api?username=jo-jordan&show_icons=true&count_private=true&include_all_commits=true&rank_icon=github&theme=tokyonight&hide_border=true&border_radius=6" />
-    <img height="170" alt="GitHub stats" src="https://github-readme-stats-pied-six-29.vercel.app/api?username=jo-jordan&show_icons=true&count_private=true&include_all_commits=true&rank_icon=github&border_color=d1d9e0&border_radius=6" />
-  </picture>
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-stats-pied-six-29.vercel.app/api/top-langs/?username=jo-jordan&layout=compact&hide=scss,css,html&langs_count=8&count_private=true&exclude_repo=github-readme-stats&theme=tokyonight&hide_border=true&border_radius=6" />
-    <img height="170" alt="Top languages" src="https://github-readme-stats-pied-six-29.vercel.app/api/top-langs/?username=jo-jordan&layout=compact&hide=scss,css,html&langs_count=8&count_private=true&exclude_repo=github-readme-stats&border_color=d1d9e0&border_radius=6" />
-  </picture>
+  <img width="49%" alt="GitHub stats" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/stats.svg" />
+  <img width="49%" alt="Most used languages" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/languages.svg" />
+</p>
+
+<p align="center">
+  <img width="100%" alt="Contribution streak" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/streak.svg" />
+</p>
+
+<p align="center">
+  <img width="100%" alt="Contributions in the last 31 days" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/activity.svg" />
 </p>
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://streak-stats.demolab.com?user=jo-jordan&theme=tokyonight&hide_border=true&border_radius=6" />
-    <img width="100%" alt="Contribution streak" src="https://streak-stats.demolab.com?user=jo-jordan&border=d1d9e0&border_radius=6" />
-  </picture>
-</p>
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github-readme-activity-graph.vercel.app/graph?username=jo-jordan&theme=tokyo-night&hide_border=true&area=true&radius=6" />
-    <img width="100%" alt="Contribution graph" src="https://github-readme-activity-graph.vercel.app/graph?username=jo-jordan&bg_color=ffffff&color=7a4a6b&title_color=7a4a6b&line=bb9af7&point=f7768e&area=true&area_color=bb9af7&hide_border=true&radius=6" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/github-snake-dark.svg" />
+    <img width="100%" alt="Snake eating the contribution grid" src="https://raw.githubusercontent.com/jo-jordan/jo-jordan/output/github-snake.svg" />
   </picture>
 </p>
 
