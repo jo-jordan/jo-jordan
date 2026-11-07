@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="170" viewBox="0 0 820 170" role="img" aria-label="Contribution streak">
+<style>
+  text { font-family: 'Segoe UI', Ubuntu, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; }
+  .t { font-size: 15px; font-weight: 600; fill: #c0caf5; }
+  .eb { font: 600 11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #e0af68; letter-spacing: .08em; }
+  .l { font-size: 13px; fill: #a9b1d6; }
+  .v { font-size: 13px; font-weight: 600; fill: #c0caf5; font-variant-numeric: tabular-nums; }
+  .s { font-size: 12px; fill: #565f89; }
+  .m { font: 600 10.5px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #565f89; letter-spacing: .1em; }
+  .in { animation: in .6s ease-out backwards; }
+  @keyframes in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .draw { animation: draw 2s ease-out .3s backwards; }
+  @keyframes draw { from { stroke-dasharray: 2400; stroke-dashoffset: 2400; } to { stroke-dasharray: 2400; stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { .in, .draw { animation: none; } }
+</style>
+<rect x=".5" y=".5" width="819" height="169" rx="10" fill="#1a1b26" stroke="#292e42"/>
+<line x1="273.3" y1="34" x2="273.3" y2="136" stroke="#292e42"/>
+<line x1="546.7" y1="34" x2="546.7" y2="136" stroke="#292e42"/>
+<g class="in"><text x="136.7" y="82" text-anchor="middle" style="font-size:30px;font-weight:700;fill:#c0caf5">5,198</text><text class="m" x="136.7" y="110" text-anchor="middle">TOTAL CONTRIBUTIONS</text><text class="s" x="136.7" y="130" text-anchor="middle">May 16, 2016 – Present</text></g>
+<g class="in" style="animation-delay:0.16s"><circle cx="410.0" cy="64" r="34" fill="none" stroke="#e0af68" stroke-width="3" stroke-opacity=".9"/><text x="410.0" y="75" text-anchor="middle" style="font-size:30px;font-weight:700;fill:#e0af68">35</text><text class="m" x="410.0" y="124" text-anchor="middle" style="fill:#e0af68">CURRENT STREAK</text><text class="s" x="410.0" y="143" text-anchor="middle">Oct 4 – Nov 7</text></g>
+<g class="in" style="animation-delay:0.32s"><text x="683.3" y="82" text-anchor="middle" style="font-size:30px;font-weight:700;fill:#f7768e">35</text><text class="m" x="683.3" y="110" text-anchor="middle">LONGEST STREAK</text><text class="s" x="683.3" y="130" text-anchor="middle">Oct 4 – Nov 7, 2026</text></g>
+</svg>
