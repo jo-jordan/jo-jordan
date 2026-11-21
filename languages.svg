@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="180" viewBox="0 0 400 180" role="img" aria-label="Most used languages">
+<style>
+  text { font-family: 'Segoe UI', Ubuntu, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; }
+  .t { font-size: 15px; font-weight: 600; fill: #c0caf5; }
+  .eb { font: 600 11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #e0af68; letter-spacing: .08em; }
+  .l { font-size: 13px; fill: #a9b1d6; }
+  .v { font-size: 13px; font-weight: 600; fill: #c0caf5; font-variant-numeric: tabular-nums; }
+  .s { font-size: 12px; fill: #565f89; }
+  .m { font: 600 10.5px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; fill: #565f89; letter-spacing: .1em; }
+  .in { animation: in .6s ease-out backwards; }
+  @keyframes in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .draw { animation: draw 2s ease-out .3s backwards; }
+  @keyframes draw { from { stroke-dasharray: 2400; stroke-dashoffset: 2400; } to { stroke-dasharray: 2400; stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { .in, .draw { animation: none; } }
+</style>
+<rect x=".5" y=".5" width="399" height="179" rx="10" fill="#1a1b26" stroke="#292e42"/>
+<text class="eb" x="24" y="34">LANGUAGES</text>
+<text class="t" x="24" y="54">Most used</text>
+<clipPath id="bar"><rect x="24" y="70" width="352" height="8" rx="4"/></clipPath>
+<g clip-path="url(#bar)">
+<rect x="24.00" y="70" width="108.00" height="8" fill="#b07219"/>
+<rect x="131.50" y="70" width="98.64" height="8" fill="#41b883"/>
+<rect x="229.64" y="70" width="69.94" height="8" fill="#f1e05a"/>
+<rect x="299.08" y="70" width="38.53" height="8" fill="#3178c6"/>
+<rect x="337.11" y="70" width="15.09" height="8" fill="#A97BFF"/>
+<rect x="351.70" y="70" width="9.66" height="8" fill="#555555"/>
+<rect x="360.86" y="70" width="8.92" height="8" fill="#00ADD8"/>
+<rect x="369.29" y="70" width="7.21" height="8" fill="#F05138"/>
+</g>
+<g class="in" style="animation-delay:0.06s"><circle cx="29" cy="100" r="4.5" fill="#b07219"/><text class="l" x="40" y="104">Java</text><text class="s" x="188" y="104" text-anchor="end">30.5%</text></g>
+<g class="in" style="animation-delay:0.12s"><circle cx="29" cy="120" r="4.5" fill="#41b883"/><text class="l" x="40" y="124">Vue</text><text class="s" x="188" y="124" text-anchor="end">27.9%</text></g>
+<g class="in" style="animation-delay:0.18s"><circle cx="29" cy="140" r="4.5" fill="#f1e05a"/><text class="l" x="40" y="144">JavaScript</text><text class="s" x="188" y="144" text-anchor="end">19.7%</text></g>
+<g class="in" style="animation-delay:0.24s"><circle cx="29" cy="160" r="4.5" fill="#3178c6"/><text class="l" x="40" y="164">TypeScript</text><text class="s" x="188" y="164" text-anchor="end">10.8%</text></g>
+<g class="in" style="animation-delay:0.30s"><circle cx="217" cy="100" r="4.5" fill="#A97BFF"/><text class="l" x="228" y="104">Kotlin</text><text class="s" x="376" y="104" text-anchor="end">4.1%</text></g>
+<g class="in" style="animation-delay:0.36s"><circle cx="217" cy="120" r="4.5" fill="#555555"/><text class="l" x="228" y="124">C</text><text class="s" x="376" y="124" text-anchor="end">2.6%</text></g>
+<g class="in" style="animation-delay:0.42s"><circle cx="217" cy="140" r="4.5" fill="#00ADD8"/><text class="l" x="228" y="144">Go</text><text class="s" x="376" y="144" text-anchor="end">2.4%</text></g>
+<g class="in" style="animation-delay:0.48s"><circle cx="217" cy="160" r="4.5" fill="#F05138"/><text class="l" x="228" y="164">Swift</text><text class="s" x="376" y="164" text-anchor="end">1.9%</text></g>
+</svg>
