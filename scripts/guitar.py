@@ -37,7 +37,11 @@ neck_d = poly([(CX - half_w(NUT), NUT - 2), (CX + half_w(NUT), NUT - 2), (CX + h
 
 T = 6.0                                    # seconds per turn
 Z_BODY, Z_NECK, Z_HEAD = (-32, 32), (6, 42), (15, 35)          # depth of each part: back face, front face
-Z_KEYS = 25                                # tuner shafts sit halfway through the headstock
+Z_KEY, Z_HOUSING, Z_POST, Z_KNOB = (6, 14), (7, 15), (35, 47), (32, 48)                         # hardware that sticks out of a face
+KEY_L, HOUSING_L, POST_L, KNOB_L = [6, 10, 14], [13, 10, 7], [38, 41, 44, 47], [36, 40, 44, 48]
+KNOBS = [(675.5, 1171.5), (675.5, 1266.5)]
+STRAPS = [(402, 741.5, 741), (537.5, 1425.5, 1414)]            # x, y of the button, y of its stem
+A_HW = [round(x - CX) for x, _ in POSTS] + [round(x - 39 - CX) for x, _ in POSTS] + [round(x - CX) for x, _ in KNOBS] + [round(x - CX) for x, _, _ in STRAPS]
 BODY_L, NECK_L, HEAD_L = list(range(-30, 31, 5)), list(range(8, 41, 4)), list(range(17, 34, 4))   # slices between the faces
 A_BODY, A_HEAD = [-230, -190, -130, -70, 0, 80, 150, 200, 235], [-25, -5, 15, 35, 55]             # where the side walls are sampled
 E = "cubic-bezier(.37, 0, .63, 1)"         # sine easing, so scaleX follows cos and the slides follow sin
@@ -82,10 +86,10 @@ STYLE = f"""
   .c {{ animation-duration: {T:g}s; animation-iteration-count: infinite; }}
 """ + "".join(
     f"  .{zc(z)} {{ animation-name: {zc(z)}; }} @keyframes {zc(z)} {{ 0%, 100% {{ transform: translateX({-z}px); animation-timing-function: {E}; }} 50% {{ transform: translateX({z}px); animation-timing-function: {E}; }} }}\n"
-    for z in sorted(set(BODY_L + NECK_L + HEAD_L + list(Z_BODY + Z_NECK + Z_HEAD) + [0, Z_KEYS]))
+    for z in sorted(set(BODY_L + NECK_L + HEAD_L + list(Z_BODY + Z_NECK + Z_HEAD) + [0] + KEY_L + HOUSING_L + POST_L + KNOB_L))
 ) + "".join(
     f"  .{cc(a)} {{ animation-name: {cc(a)}; }} @keyframes {cc(a)} {{ 0%, 100% {{ transform: translateX({a}px); animation-timing-function: {E}; }} 50% {{ transform: translateX({-a}px); animation-timing-function: {E}; }} }}\n"
-    for a in sorted(set(A_BODY + A_HEAD)) if a
+    for a in sorted(set(A_BODY + A_HEAD + A_HW)) if a
 ) + f"""  .front {{ animation: front {T:g}s step-end infinite; }}
   @keyframes front {{ 0% {{ opacity: 1; }} 25% {{ opacity: 0; }} 75%, 100% {{ opacity: 1; }} }}
   .back {{ opacity: 0; animation: back {T:g}s step-end infinite; }}
@@ -188,8 +192,12 @@ def keys():                                                     # tuner shafts a
 
 
 def strap_buttons():
-  add('<rect x="397.5" y="741" width="9" height="9" fill="#9a9c9e"/><ellipse cx="402" cy="741.5" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>')
-  add('<rect x="533" y="1414" width="9" height="9" fill="#9a9c9e"/><ellipse cx="537.5" cy="1425.5" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>')
+    """Round about a vertical axis, so they look the same from every side: they move with the turn but are never squashed."""
+    for x, y, stem in STRAPS:
+        a = round(x - CX)
+        art = (f'<rect x="{CX - 4.5}" y="{stem}" width="9" height="9" fill="#9a9c9e"/>'
+               f'<ellipse cx="{CX}" cy="{y}" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>')
+        add(f'<g class="c {cc(a)}">{art}</g>')
 
 
 def head_finish():
@@ -213,15 +221,20 @@ for a in A_HEAD:
     s = span(head_d, CX + a)
     if s and s[1] - s[0] > 30:
         side_wall(a, s[0] + 2, s[1] - 2, Z_HEAD, "url(#sideMaple)", 3)
+for x, y in POSTS:
+    side_wall(round(x - 39 - CX), y - 26, y - 2, Z_KEY, "url(#chromeV)", 4)        # tuner button
+    side_wall(round(x - CX), y - 15, y + 15, Z_HOUSING, "#c4c6c7", 2)             # tuner housing
+    side_wall(round(x - CX), y - 6, y + 6, Z_POST, "url(#chromeV)", 2)            # tuner post
+for x, y in KNOBS:
+    side_wall(round(x - CX), y - 19, y + 19, Z_KNOB, "url(#chromeV)", 3)
 
 # ================================================================ front of the guitar
 add('<g class="front">')
-open_face(Z_KEYS)
-keys()
-close_face()
-open_face(0)
 strap_buttons()
-close_face()
+for z in KEY_L:
+    open_face(z)
+    keys()
+    close_face()
 
 # ---------------------------------------------------------------- body: grain, rolled edge, gloss
 rim("neck", [z for z in NECK_L if z < Z_BODY[1]], neck_shade)   # the neck heel sits in a pocket: the body hides this part of it
@@ -282,15 +295,24 @@ for y in (1053, 1136, 1304):
     screw(673.3, y, 3.6)
 add('<rect x="671.6" y="1079" width="3.6" height="46" rx="1.8" fill="#101011"/>')
 add('<g filter="url(#lift)"><rect x="664.5" y="1087" width="18" height="25" rx="5" fill="url(#pickup)" stroke="#000" stroke-width=".5"/></g><rect x="667" y="1089.5" width="13" height="3" rx="1.5" fill="#fff" fill-opacity=".25"/>')
-for cy in (1171.5, 1266.5):
-    cx = 675.5
-    add(f'<ellipse cx="{cx}" cy="{cy + 5}" rx="21" ry="20" fill="#000" fill-opacity=".28" filter="url(#b2)"/>'
-        f'<circle cx="{cx}" cy="{cy}" r="20" fill="#8d8f91" stroke="#5f6163" stroke-width=".7"/>'
-        f'<circle cx="{cx}" cy="{cy}" r="19" fill="none" stroke="#e9e9e9" stroke-width="2.4" stroke-dasharray="1.1 1.4"/>'
-        f'<circle cx="{cx}" cy="{cy - 1.5}" r="16" fill="url(#knobTop)" stroke="#7b7d7f" stroke-width=".6"/>'
-        f'<path d="M{cx} {cy - 1.5} L{cx - 6} {cy - 17.2} A16 16 0 0 1 {cx + 6} {cy - 17.2} Z M{cx} {cy - 1.5} L{cx + 6} {cy + 14.2} A16 16 0 0 1 {cx - 6} {cy + 14.2} Z" fill="#fff" fill-opacity=".55"/>'
-        f'<path d="M{cx} {cy - 1.5} L{cx - 15.7} {cy - 5} A16 16 0 0 0 {cx - 15.7} {cy + 2} Z M{cx} {cy - 1.5} L{cx + 15.7} {cy - 5} A16 16 0 0 1 {cx + 15.7} {cy + 2} Z" fill="#6d6f71" fill-opacity=".28"/>')
+def knobs(part):
+    for cx, cy in KNOBS:
+        if part == "base":
+            add(f'<ellipse cx="{cx}" cy="{cy + 5}" rx="21" ry="20" fill="#000" fill-opacity=".28" filter="url(#b2)"/>')
+        add(f'<circle cx="{cx}" cy="{cy}" r="20" fill="#8d8f91" stroke="#5f6163" stroke-width=".7"/>'
+            f'<circle cx="{cx}" cy="{cy}" r="19" fill="none" stroke="#e9e9e9" stroke-width="2.4" stroke-dasharray="1.1 1.4"/>')
+        if part == "cap":
+            add(f'<circle cx="{cx}" cy="{cy - 1.5}" r="16" fill="url(#knobTop)" stroke="#7b7d7f" stroke-width=".6"/>'
+                f'<path d="M{cx} {cy - 1.5} L{cx - 6} {cy - 17.2} A16 16 0 0 1 {cx + 6} {cy - 17.2} Z M{cx} {cy - 1.5} L{cx + 6} {cy + 14.2} A16 16 0 0 1 {cx - 6} {cy + 14.2} Z" fill="#fff" fill-opacity=".55"/>'
+                f'<path d="M{cx} {cy - 1.5} L{cx - 15.7} {cy - 5} A16 16 0 0 0 {cx - 15.7} {cy + 2} Z M{cx} {cy - 1.5} L{cx + 15.7} {cy - 5} A16 16 0 0 1 {cx + 15.7} {cy + 2} Z" fill="#6d6f71" fill-opacity=".28"/>')
+
+
+knobs("base")
 close_face()
+for z in KNOB_L:
+    open_face(z)
+    knobs("cap" if z == KNOB_L[-1] else "wall")
+    close_face()
 
 # ---------------------------------------------------------------- headstock: tuner posts
 rim("head", HEAD_L, head_shade)
@@ -302,6 +324,11 @@ for x, y in POSTS:
         f'<circle cx="{x:.1f}" cy="{y}" r="8" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1"/>'
         f'<circle cx="{x:.1f}" cy="{y}" r="6.2" fill="url(#dome)" stroke="#6f7173" stroke-width=".6"/>')
 close_face()
+for z in POST_L:
+    open_face(z)
+    for x, y in POSTS:
+        add(f'<circle cx="{x:.1f}" cy="{y}" r="6.2" fill="url(#dome)" stroke="#6f7173" stroke-width=".6"/>')
+    close_face()
 
 # ---------------------------------------------------------------- neck: maple board, frets, dots, nut
 rim("neck", [z for z in NECK_L if z >= Z_BODY[1]], neck_shade)  # only this much of the neck stands proud of the body
@@ -350,22 +377,30 @@ add('</g>')
 
 # ================================================================ back of the guitar
 add('<g class="back">')
-open_face(Z_KEYS)
-keys()
-close_face()
-open_face(0)
 strap_buttons()
-close_face()
 
 rim("head", HEAD_L[::-1], head_shade)
 open_face(Z_HEAD[0])
 add('<use xlink:href="#head" fill="url(#headMaple)"/>')
 head_finish()
-for x, y in POSTS:                                              # tuner housings
+close_face()
+
+
+def housings():
+  for x, y in POSTS:
     add(f'<g transform="rotate(19.1 {x:.1f} {y})" filter="url(#lift)"><rect x="{x - 12.5:.1f}" y="{y - 16}" width="25" height="32" rx="3.5" fill="url(#plate)" stroke="#77797b" stroke-width=".8"/>'
         f'<rect x="{x - 9.5:.1f}" y="{y - 13}" width="19" height="26" rx="2" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1"/>'
         f'<circle cx="{x:.1f}" cy="{y}" r="5.2" fill="url(#dome)" stroke="#77797b" stroke-width=".5"/></g>')
-close_face()
+
+
+for z in KEY_L[::-1]:
+    open_face(z)
+    keys()
+    close_face()
+for z in HOUSING_L:
+    open_face(z)
+    housings()
+    close_face()
 
 rim("neck", NECK_L[::-1], neck_shade)
 open_face(Z_NECK[0])
