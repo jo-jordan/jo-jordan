@@ -36,8 +36,9 @@ neck_d = poly([(CX - half_w(NUT), NUT - 2), (CX + half_w(NUT), NUT - 2), (CX + h
                (CX - half_w(FB_END) + 3, FB_END), (CX - half_w(FB_END), FB_END - 3)])
 
 T = 6.0                                    # seconds per turn
-Z_BODY, Z_NECK, Z_HEAD = (-32, 32), (-2, 34), (6, 26)          # depth of each part: back face, front face
-BODY_L, NECK_L, HEAD_L = list(range(-30, 31, 5)), list(range(0, 31, 5)), list(range(8, 25, 4))   # slices between the faces
+Z_BODY, Z_NECK, Z_HEAD = (-32, 32), (6, 42), (15, 35)          # depth of each part: back face, front face
+Z_KEYS = 25                                # tuner shafts sit halfway through the headstock
+BODY_L, NECK_L, HEAD_L = list(range(-30, 31, 5)), list(range(8, 41, 4)), list(range(17, 34, 4))   # slices between the faces
 A_BODY, A_HEAD = [-230, -190, -130, -70, 0, 80, 150, 200, 235], [-25, -5, 15, 35, 55]             # where the side walls are sampled
 E = "cubic-bezier(.37, 0, .63, 1)"         # sine easing, so scaleX follows cos and the slides follow sin
 zc = lambda v: ("z" if v >= 0 else "zm") + str(abs(int(v)))
@@ -81,7 +82,7 @@ STYLE = f"""
   .c {{ animation-duration: {T:g}s; animation-iteration-count: infinite; }}
 """ + "".join(
     f"  .{zc(z)} {{ animation-name: {zc(z)}; }} @keyframes {zc(z)} {{ 0%, 100% {{ transform: translateX({-z}px); animation-timing-function: {E}; }} 50% {{ transform: translateX({z}px); animation-timing-function: {E}; }} }}\n"
-    for z in sorted(set(BODY_L + NECK_L + HEAD_L + list(Z_BODY + Z_NECK + Z_HEAD) + [0, 16]))
+    for z in sorted(set(BODY_L + NECK_L + HEAD_L + list(Z_BODY + Z_NECK + Z_HEAD) + [0, Z_KEYS]))
 ) + "".join(
     f"  .{cc(a)} {{ animation-name: {cc(a)}; }} @keyframes {cc(a)} {{ 0%, 100% {{ transform: translateX({a}px); animation-timing-function: {E}; }} 50% {{ transform: translateX({-a}px); animation-timing-function: {E}; }} }}\n"
     for a in sorted(set(A_BODY + A_HEAD)) if a
@@ -215,7 +216,7 @@ for a in A_HEAD:
 
 # ================================================================ front of the guitar
 add('<g class="front">')
-open_face(16)
+open_face(Z_KEYS)
 keys()
 close_face()
 open_face(0)
@@ -223,6 +224,7 @@ strap_buttons()
 close_face()
 
 # ---------------------------------------------------------------- body: grain, rolled edge, gloss
+rim("neck", [z for z in NECK_L if z < Z_BODY[1]], neck_shade)   # the neck heel sits in a pocket: the body hides this part of it
 rim("bodyBack", BODY_L, body_shade)
 open_face(Z_BODY[1])
 add('<use xlink:href="#body" fill="url(#butter)"/>')
@@ -302,7 +304,7 @@ for x, y in POSTS:
 close_face()
 
 # ---------------------------------------------------------------- neck: maple board, frets, dots, nut
-rim("neck", NECK_L, neck_shade)
+rim("neck", [z for z in NECK_L if z >= Z_BODY[1]], neck_shade)  # only this much of the neck stands proud of the body
 open_face(Z_NECK[1])
 add('<g filter="url(#lift)"><use xlink:href="#neck" fill="url(#maple)"/></g>')   # over the pickguard and the neck pocket
 add('<g clip-path="url(#neckClip)">')
@@ -348,7 +350,7 @@ add('</g>')
 
 # ================================================================ back of the guitar
 add('<g class="back">')
-open_face(16)
+open_face(Z_KEYS)
 keys()
 close_face()
 open_face(0)

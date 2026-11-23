@@ -51,7 +51,6 @@
   .zm15 { animation-name: zm15; } @keyframes zm15 { 0%, 100% { transform: translateX(15px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(-15px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .zm10 { animation-name: zm10; } @keyframes zm10 { 0%, 100% { transform: translateX(10px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(-10px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .zm5 { animation-name: zm5; } @keyframes zm5 { 0%, 100% { transform: translateX(5px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(-5px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
-  .zm2 { animation-name: zm2; } @keyframes zm2 { 0%, 100% { transform: translateX(2px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(-2px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .z0 { animation-name: z0; } @keyframes z0 { 0%, 100% { transform: translateX(0px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(0px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .z5 { animation-name: z5; } @keyframes z5 { 0%, 100% { transform: translateX(-5px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(5px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .z6 { animation-name: z6; } @keyframes z6 { 0%, 100% { transform: translateX(-6px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(6px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
@@ -60,13 +59,20 @@
   .z12 { animation-name: z12; } @keyframes z12 { 0%, 100% { transform: translateX(-12px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(12px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .z15 { animation-name: z15; } @keyframes z15 { 0%, 100% { transform: translateX(-15px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(15px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .z16 { animation-name: z16; } @keyframes z16 { 0%, 100% { transform: translateX(-16px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(16px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
+  .z17 { animation-name: z17; } @keyframes z17 { 0%, 100% { transform: translateX(-17px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(17px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .z20 { animation-name: z20; } @keyframes z20 { 0%, 100% { transform: translateX(-20px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(20px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
+  .z21 { animation-name: z21; } @keyframes z21 { 0%, 100% { transform: translateX(-21px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(21px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .z24 { animation-name: z24; } @keyframes z24 { 0%, 100% { transform: translateX(-24px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(24px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .z25 { animation-name: z25; } @keyframes z25 { 0%, 100% { transform: translateX(-25px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(25px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
-  .z26 { animation-name: z26; } @keyframes z26 { 0%, 100% { transform: translateX(-26px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(26px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
+  .z28 { animation-name: z28; } @keyframes z28 { 0%, 100% { transform: translateX(-28px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(28px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
+  .z29 { animation-name: z29; } @keyframes z29 { 0%, 100% { transform: translateX(-29px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(29px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .z30 { animation-name: z30; } @keyframes z30 { 0%, 100% { transform: translateX(-30px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(30px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .z32 { animation-name: z32; } @keyframes z32 { 0%, 100% { transform: translateX(-32px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(32px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
-  .z34 { animation-name: z34; } @keyframes z34 { 0%, 100% { transform: translateX(-34px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(34px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
+  .z33 { animation-name: z33; } @keyframes z33 { 0%, 100% { transform: translateX(-33px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(33px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
+  .z35 { animation-name: z35; } @keyframes z35 { 0%, 100% { transform: translateX(-35px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(35px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
+  .z36 { animation-name: z36; } @keyframes z36 { 0%, 100% { transform: translateX(-36px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(36px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
+  .z40 { animation-name: z40; } @keyframes z40 { 0%, 100% { transform: translateX(-40px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(40px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
+  .z42 { animation-name: z42; } @keyframes z42 { 0%, 100% { transform: translateX(-42px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(42px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .cm230 { animation-name: cm230; } @keyframes cm230 { 0%, 100% { transform: translateX(-230px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(230px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .cm190 { animation-name: cm190; } @keyframes cm190 { 0%, 100% { transform: translateX(-190px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(190px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
   .cm130 { animation-name: cm130; } @keyframes cm130 { 0%, 100% { transform: translateX(-130px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } 50% { transform: translateX(130px); animation-timing-function: cubic-bezier(.37, 0, .63, 1); } }
@@ -106,14 +112,14 @@
 <g class="c c150"><g transform="translate(531.75 0)"><g class="side"><rect x="-32" y="784" width="64" height="624" rx="5" fill="url(#sideBody)"/></g></g></g>
 <g class="c c200"><g transform="translate(531.75 0)"><g class="side"><rect x="-32" y="1064" width="64" height="318" rx="5" fill="url(#sideBody)"/></g></g></g>
 <g class="c c235"><g transform="translate(531.75 0)"><g class="side"><rect x="-32" y="1139" width="64" height="204" rx="5" fill="url(#sideBody)"/></g></g></g>
-<g transform="translate(531.75 0)"><g class="side"><rect x="-2" y="236" width="36" height="664" rx="3" fill="url(#sideMaple)"/></g></g>
-<g class="c cm25"><g transform="translate(531.75 0)"><g class="side"><rect x="6" y="105" width="20" height="125" rx="3" fill="url(#sideMaple)"/></g></g></g>
-<g class="c cm5"><g transform="translate(531.75 0)"><g class="side"><rect x="6" y="47" width="20" height="183" rx="3" fill="url(#sideMaple)"/></g></g></g>
-<g class="c c15"><g transform="translate(531.75 0)"><g class="side"><rect x="6" y="-7" width="20" height="237" rx="3" fill="url(#sideMaple)"/></g></g></g>
-<g class="c c35"><g transform="translate(531.75 0)"><g class="side"><rect x="6" y="-21" width="20" height="238" rx="3" fill="url(#sideMaple)"/></g></g></g>
-<g class="c c55"><g transform="translate(531.75 0)"><g class="side"><rect x="6" y="-20" width="20" height="177" rx="3" fill="url(#sideMaple)"/></g></g></g>
+<g transform="translate(531.75 0)"><g class="side"><rect x="6" y="236" width="36" height="664" rx="3" fill="url(#sideMaple)"/></g></g>
+<g class="c cm25"><g transform="translate(531.75 0)"><g class="side"><rect x="15" y="105" width="20" height="125" rx="3" fill="url(#sideMaple)"/></g></g></g>
+<g class="c cm5"><g transform="translate(531.75 0)"><g class="side"><rect x="15" y="47" width="20" height="183" rx="3" fill="url(#sideMaple)"/></g></g></g>
+<g class="c c15"><g transform="translate(531.75 0)"><g class="side"><rect x="15" y="-7" width="20" height="237" rx="3" fill="url(#sideMaple)"/></g></g></g>
+<g class="c c35"><g transform="translate(531.75 0)"><g class="side"><rect x="15" y="-21" width="20" height="238" rx="3" fill="url(#sideMaple)"/></g></g></g>
+<g class="c c55"><g transform="translate(531.75 0)"><g class="side"><rect x="15" y="-20" width="20" height="177" rx="3" fill="url(#sideMaple)"/></g></g></g>
 <g class="front">
-<g class="z z16"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
+<g class="z z25"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
 <path d="M492.0 170.7 L465.0 161.0" stroke="url(#chromeV)" stroke-width="7.5"/><g transform="rotate(19.7 465.0 161.0)"><ellipse cx="465.0" cy="161.0" rx="12.5" ry="16.5" fill="url(#chromeV)" stroke="#77797b" stroke-width=".8"/><ellipse cx="462.0" cy="156.0" rx="5" ry="6" fill="#fff" fill-opacity=".75"/></g>
 <path d="M503.1 138.7 L476.1 129.0" stroke="url(#chromeV)" stroke-width="7.5"/><g transform="rotate(19.7 476.1 129.0)"><ellipse cx="476.1" cy="129.0" rx="12.5" ry="16.5" fill="url(#chromeV)" stroke="#77797b" stroke-width=".8"/><ellipse cx="473.1" cy="124.0" rx="5" ry="6" fill="#fff" fill-opacity=".75"/></g>
 <path d="M514.1 106.7 L487.1 97.0" stroke="url(#chromeV)" stroke-width="7.5"/><g transform="rotate(19.7 487.1 97.0)"><ellipse cx="487.1" cy="97.0" rx="12.5" ry="16.5" fill="url(#chromeV)" stroke="#77797b" stroke-width=".8"/><ellipse cx="484.1" cy="92.0" rx="5" ry="6" fill="#fff" fill-opacity=".75"/></g>
@@ -125,6 +131,12 @@
 <rect x="397.5" y="741" width="9" height="9" fill="#9a9c9e"/><ellipse cx="402" cy="741.5" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>
 <rect x="533" y="1414" width="9" height="9" fill="#9a9c9e"/><ellipse cx="537.5" cy="1425.5" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>
 </g></g></g></g>
+<g class="z z8"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#f7cc68"/></g></g></g>
+<g class="z z12"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#d79f3a"/></g></g></g>
+<g class="z z16"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#daa33d"/></g></g></g>
+<g class="z z20"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#dda640"/></g></g></g>
+<g class="z z24"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e0aa42"/></g></g></g>
+<g class="z z28"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e2ad45"/></g></g></g>
 <g class="z zm30"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#bodyBack" x="-531.75" fill="#f6c446"/></g></g></g>
 <g class="z zm25"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#bodyBack" x="-531.75" fill="#d39019"/></g></g></g>
 <g class="z zm20"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#bodyBack" x="-531.75" fill="#d5921a"/></g></g></g>
@@ -216,12 +228,12 @@
 <ellipse cx="675.5" cy="1176.5" rx="21" ry="20" fill="#000" fill-opacity=".28" filter="url(#b2)"/><circle cx="675.5" cy="1171.5" r="20" fill="#8d8f91" stroke="#5f6163" stroke-width=".7"/><circle cx="675.5" cy="1171.5" r="19" fill="none" stroke="#e9e9e9" stroke-width="2.4" stroke-dasharray="1.1 1.4"/><circle cx="675.5" cy="1170.0" r="16" fill="url(#knobTop)" stroke="#7b7d7f" stroke-width=".6"/><path d="M675.5 1170.0 L669.5 1154.3 A16 16 0 0 1 681.5 1154.3 Z M675.5 1170.0 L681.5 1185.7 A16 16 0 0 1 669.5 1185.7 Z" fill="#fff" fill-opacity=".55"/><path d="M675.5 1170.0 L659.8 1166.5 A16 16 0 0 0 659.8 1173.5 Z M675.5 1170.0 L691.2 1166.5 A16 16 0 0 1 691.2 1173.5 Z" fill="#6d6f71" fill-opacity=".28"/>
 <ellipse cx="675.5" cy="1271.5" rx="21" ry="20" fill="#000" fill-opacity=".28" filter="url(#b2)"/><circle cx="675.5" cy="1266.5" r="20" fill="#8d8f91" stroke="#5f6163" stroke-width=".7"/><circle cx="675.5" cy="1266.5" r="19" fill="none" stroke="#e9e9e9" stroke-width="2.4" stroke-dasharray="1.1 1.4"/><circle cx="675.5" cy="1265.0" r="16" fill="url(#knobTop)" stroke="#7b7d7f" stroke-width=".6"/><path d="M675.5 1265.0 L669.5 1249.3 A16 16 0 0 1 681.5 1249.3 Z M675.5 1265.0 L681.5 1280.7 A16 16 0 0 1 669.5 1280.7 Z" fill="#fff" fill-opacity=".55"/><path d="M675.5 1265.0 L659.8 1261.5 A16 16 0 0 0 659.8 1268.5 Z M675.5 1265.0 L691.2 1261.5 A16 16 0 0 1 691.2 1268.5 Z" fill="#6d6f71" fill-opacity=".28"/>
 </g></g></g></g>
-<g class="z z8"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#f9d079"/></g></g></g>
-<g class="z z12"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#dfaa44"/></g></g></g>
-<g class="z z16"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#e4b048"/></g></g></g>
-<g class="z z20"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#e8b54e"/></g></g></g>
-<g class="z z24"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#f9d079"/></g></g></g>
-<g class="z z26"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
+<g class="z z17"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#f9d079"/></g></g></g>
+<g class="z z21"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#dfaa44"/></g></g></g>
+<g class="z z25"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#e4b048"/></g></g></g>
+<g class="z z29"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#e8b54e"/></g></g></g>
+<g class="z z33"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#f9d079"/></g></g></g>
+<g class="z z35"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
 <use xlink:href="#head" fill="url(#headMaple)"/>
 <g clip-path="url(#headClip)">
 <path d="M469 240 C483 150 499 60 513 -30" fill="none" stroke="#c98f2a" stroke-opacity="0.12" stroke-width="0.9"/>
@@ -243,14 +255,10 @@
 <g filter="url(#lift)"><circle cx="548.2" cy="47" r="11.5" fill="url(#chromeH)" stroke="#6f7173" stroke-width=".7"/></g><circle cx="548.2" cy="47" r="8" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1"/><circle cx="548.2" cy="47" r="6.2" fill="url(#dome)" stroke="#6f7173" stroke-width=".6"/>
 <g filter="url(#lift)"><circle cx="559.3" cy="15" r="11.5" fill="url(#chromeH)" stroke="#6f7173" stroke-width=".7"/></g><circle cx="559.3" cy="15" r="8" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1"/><circle cx="559.3" cy="15" r="6.2" fill="url(#dome)" stroke="#6f7173" stroke-width=".6"/>
 </g></g></g></g>
-<g class="z z0"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#f7cc68"/></g></g></g>
-<g class="z z5"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#d8a03b"/></g></g></g>
-<g class="z z10"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#dba43e"/></g></g></g>
-<g class="z z15"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#dfa942"/></g></g></g>
-<g class="z z20"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e2ad45"/></g></g></g>
-<g class="z z25"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e6b149"/></g></g></g>
-<g class="z z30"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#f7cc68"/></g></g></g>
-<g class="z z34"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
+<g class="z z32"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e5b048"/></g></g></g>
+<g class="z z36"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e8b44b"/></g></g></g>
+<g class="z z40"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#f7cc68"/></g></g></g>
+<g class="z z42"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
 <g filter="url(#lift)"><use xlink:href="#neck" fill="url(#maple)"/></g>
 <g clip-path="url(#neckClip)">
 <path d="M498 230 C500 460 501 700 502 905" fill="none" stroke="#c98f2a" stroke-opacity="0.10" stroke-width="1.0"/>
@@ -311,7 +319,7 @@
 </g></g></g></g>
 </g>
 <g class="back">
-<g class="z z16"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
+<g class="z z25"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
 <path d="M492.0 170.7 L465.0 161.0" stroke="url(#chromeV)" stroke-width="7.5"/><g transform="rotate(19.7 465.0 161.0)"><ellipse cx="465.0" cy="161.0" rx="12.5" ry="16.5" fill="url(#chromeV)" stroke="#77797b" stroke-width=".8"/><ellipse cx="462.0" cy="156.0" rx="5" ry="6" fill="#fff" fill-opacity=".75"/></g>
 <path d="M503.1 138.7 L476.1 129.0" stroke="url(#chromeV)" stroke-width="7.5"/><g transform="rotate(19.7 476.1 129.0)"><ellipse cx="476.1" cy="129.0" rx="12.5" ry="16.5" fill="url(#chromeV)" stroke="#77797b" stroke-width=".8"/><ellipse cx="473.1" cy="124.0" rx="5" ry="6" fill="#fff" fill-opacity=".75"/></g>
 <path d="M514.1 106.7 L487.1 97.0" stroke="url(#chromeV)" stroke-width="7.5"/><g transform="rotate(19.7 487.1 97.0)"><ellipse cx="487.1" cy="97.0" rx="12.5" ry="16.5" fill="url(#chromeV)" stroke="#77797b" stroke-width=".8"/><ellipse cx="484.1" cy="92.0" rx="5" ry="6" fill="#fff" fill-opacity=".75"/></g>
@@ -323,12 +331,12 @@
 <rect x="397.5" y="741" width="9" height="9" fill="#9a9c9e"/><ellipse cx="402" cy="741.5" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>
 <rect x="533" y="1414" width="9" height="9" fill="#9a9c9e"/><ellipse cx="537.5" cy="1425.5" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>
 </g></g></g></g>
-<g class="z z24"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#f9d079"/></g></g></g>
-<g class="z z20"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#e8b54e"/></g></g></g>
-<g class="z z16"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#e4b048"/></g></g></g>
-<g class="z z12"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#dfaa44"/></g></g></g>
-<g class="z z8"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#f9d079"/></g></g></g>
-<g class="z z6"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
+<g class="z z33"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#f9d079"/></g></g></g>
+<g class="z z29"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#e8b54e"/></g></g></g>
+<g class="z z25"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#e4b048"/></g></g></g>
+<g class="z z21"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#dfaa44"/></g></g></g>
+<g class="z z17"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#head" x="-531.75" fill="#f9d079"/></g></g></g>
+<g class="z z15"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
 <use xlink:href="#head" fill="url(#headMaple)"/>
 <g clip-path="url(#headClip)">
 <path d="M469 240 C483 150 499 60 513 -30" fill="none" stroke="#c98f2a" stroke-opacity="0.11" stroke-width="1.6"/>
@@ -350,14 +358,16 @@
 <g transform="rotate(19.1 548.2 47)" filter="url(#lift)"><rect x="535.7" y="31" width="25" height="32" rx="3.5" fill="url(#plate)" stroke="#77797b" stroke-width=".8"/><rect x="538.7" y="34" width="19" height="26" rx="2" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1"/><circle cx="548.2" cy="47" r="5.2" fill="url(#dome)" stroke="#77797b" stroke-width=".5"/></g>
 <g transform="rotate(19.1 559.3 15)" filter="url(#lift)"><rect x="546.8" y="-1" width="25" height="32" rx="3.5" fill="url(#plate)" stroke="#77797b" stroke-width=".8"/><rect x="549.8" y="2" width="19" height="26" rx="2" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1"/><circle cx="559.3" cy="15" r="5.2" fill="url(#dome)" stroke="#77797b" stroke-width=".5"/></g>
 </g></g></g></g>
-<g class="z z30"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#f7cc68"/></g></g></g>
-<g class="z z25"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e6b149"/></g></g></g>
-<g class="z z20"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e2ad45"/></g></g></g>
-<g class="z z15"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#dfa942"/></g></g></g>
-<g class="z z10"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#dba43e"/></g></g></g>
-<g class="z z5"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#d8a03b"/></g></g></g>
-<g class="z z0"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#f7cc68"/></g></g></g>
-<g class="z zm2"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
+<g class="z z40"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#f7cc68"/></g></g></g>
+<g class="z z36"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e8b44b"/></g></g></g>
+<g class="z z32"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e5b048"/></g></g></g>
+<g class="z z28"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e2ad45"/></g></g></g>
+<g class="z z24"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#e0aa42"/></g></g></g>
+<g class="z z20"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#dda640"/></g></g></g>
+<g class="z z16"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#daa33d"/></g></g></g>
+<g class="z z12"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#d79f3a"/></g></g></g>
+<g class="z z8"><g transform="translate(531.75 0)"><g class="spin"><use xlink:href="#neck" x="-531.75" fill="#f7cc68"/></g></g></g>
+<g class="z z6"><g transform="translate(531.75 0)"><g class="spin"><g transform="translate(-531.75 0)">
 <use xlink:href="#neck" fill="url(#neckBack)"/>
 <rect x="528.95" y="262" width="5.6" height="520" rx="2.8" fill="#5b3414"/><rect x="528.95" y="262" width="1.4" height="520" rx=".7" fill="#fff" fill-opacity=".18"/>
 <use xlink:href="#neck" fill="none" stroke="#b9801c" stroke-opacity=".75" stroke-width="1"/>
