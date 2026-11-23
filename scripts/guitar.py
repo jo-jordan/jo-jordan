@@ -5,11 +5,14 @@
 
 Body, headstock and pickguard outlines come from scripts/guitar_outline.json.
 Frets are placed with the 12th-root-of-two rule between the nut and the saddles.
+The guitar turns about the neck axis. It is built from flat slices at different
+depths, so it keeps its thickness through the turn and shows its back.
 """
 import json
 import math
 import os
 import random
+import re
 import sys
 
 random.seed(8)
@@ -32,8 +35,95 @@ body_d, head_d, guard_d, back_d = O["body"], O["head"], O["guard"], O["body_back
 neck_d = poly([(CX - half_w(NUT), NUT - 2), (CX + half_w(NUT), NUT - 2), (CX + half_w(FB_END), FB_END - 3), (CX + half_w(FB_END) - 3, FB_END),
                (CX - half_w(FB_END) + 3, FB_END), (CX - half_w(FB_END), FB_END - 3)])
 
+T = 6.0                                    # seconds per turn
+Z_BODY, Z_NECK, Z_HEAD = (-32, 32), (-2, 34), (6, 26)          # depth of each part: back face, front face
+BODY_L, NECK_L, HEAD_L = list(range(-30, 31, 5)), list(range(0, 31, 5)), list(range(8, 25, 4))   # slices between the faces
+A_BODY, A_HEAD = [-230, -190, -130, -70, 0, 80, 150, 200, 235], [-25, -5, 15, 35, 55]             # where the side walls are sampled
+E = "cubic-bezier(.37, 0, .63, 1)"         # sine easing, so scaleX follows cos and the slides follow sin
+zc = lambda v: ("z" if v >= 0 else "zm") + str(abs(int(v)))
+cc = lambda v: ("c" if v >= 0 else "cm") + str(abs(int(v)))
+
+
+def mix(a, b, t):
+    pa, pb = [int(a[i:i + 2], 16) for i in (1, 3, 5)], [int(b[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#%02x%02x%02x" % tuple(round(u + (v - u) * t) for u, v in zip(pa, pb))
+
+
+def shader(zr, back, front, edge):
+    """Colour of a slice at depth z: lighter next to either face, where the edge rolls over."""
+    return lambda z: edge if min(z - zr[0], zr[1] - z) <= 4 else mix(back, front, (z - zr[0]) / (zr[1] - zr[0]))
+
+
+body_shade = shader(Z_BODY, "#d08c17", "#ecae29", "#f6c446")
+neck_shade = shader(Z_NECK, "#d39a36", "#ecb94f", "#f7cc68")
+head_shade = shader(Z_HEAD, "#d8a23c", "#efbd55", "#f9d079")
+
+
+def span(d, xs):
+    """Longest stretch of the vertical line x = xs that lies inside outline d."""
+    pts = [tuple(float(v) for v in a.split()[-2:]) for _, a in re.findall(r"([MLCQ])([^MLCQZ]*)", d)]
+    ys = sorted(p[1] + (q[1] - p[1]) * (xs - p[0]) / (q[0] - p[0]) for p, q in zip(pts, pts[1:] + pts[:1]) if (p[0] - xs) * (q[0] - xs) < 0)
+    pairs = [(ys[i], ys[i + 1]) for i in range(0, len(ys) - 1, 2)]
+    return max(pairs, key=lambda s: s[1] - s[0]) if pairs else None
+
+
+wave_steps = [(0, 0), (1, 1), (2.8, -.86), (4.6, .74), (6.4, -.63), (8.2, .53), (10, -.44), (12, .36), (14.5, -.28), (17, .2), (20, -.14), (24, .08)]
+k = 4 / T                                  # the strum keeps its length whatever the turn takes
+STYLE = f"""
+  .float {{ animation: float 7s ease-in-out infinite; }}
+  @keyframes float {{ 0%, 100% {{ transform: translateY(0); }} 50% {{ transform: translateY(-7px); }} }}
+  /* One turn about the neck axis every {T:g} s. Every part is a stack of slices; a slice at depth z is drawn at x*cos + z*sin. */
+  .spin {{ animation: spin {T:g}s infinite; }}
+  @keyframes spin {{ 0%, 100% {{ transform: scaleX(1); animation-timing-function: {E}; }} 50% {{ transform: scaleX(-1); animation-timing-function: {E}; }} }}
+  .side {{ transform: scaleX(0); animation: side {T:g}s {-T / 4:g}s infinite; }}
+  @keyframes side {{ 0%, 100% {{ transform: scaleX(-1); animation-timing-function: {E}; }} 50% {{ transform: scaleX(1); animation-timing-function: {E}; }} }}
+  .z {{ animation-duration: {T:g}s; animation-delay: {-T / 4:g}s; animation-iteration-count: infinite; }}
+  .c {{ animation-duration: {T:g}s; animation-iteration-count: infinite; }}
+""" + "".join(
+    f"  .{zc(z)} {{ animation-name: {zc(z)}; }} @keyframes {zc(z)} {{ 0%, 100% {{ transform: translateX({-z}px); animation-timing-function: {E}; }} 50% {{ transform: translateX({z}px); animation-timing-function: {E}; }} }}\n"
+    for z in sorted(set(BODY_L + NECK_L + HEAD_L + list(Z_BODY + Z_NECK + Z_HEAD) + [0, 16]))
+) + "".join(
+    f"  .{cc(a)} {{ animation-name: {cc(a)}; }} @keyframes {cc(a)} {{ 0%, 100% {{ transform: translateX({a}px); animation-timing-function: {E}; }} 50% {{ transform: translateX({-a}px); animation-timing-function: {E}; }} }}\n"
+    for a in sorted(set(A_BODY + A_HEAD)) if a
+) + f"""  .front {{ animation: front {T:g}s step-end infinite; }}
+  @keyframes front {{ 0% {{ opacity: 1; }} 25% {{ opacity: 0; }} 75%, 100% {{ opacity: 1; }} }}
+  .back {{ opacity: 0; animation: back {T:g}s step-end infinite; }}
+  @keyframes back {{ 0% {{ opacity: 0; }} 25% {{ opacity: 1; }} 75%, 100% {{ opacity: 0; }} }}
+  .sheen {{ animation: sheen 8s ease-in-out infinite; }}
+  @keyframes sheen {{ 0%, 15% {{ transform: translateX(-420px); }} 55%, 100% {{ transform: translateX(420px); }} }}
+  .glint {{ transform-box: fill-box; transform-origin: center; animation: glint {T:g}s ease-in-out infinite; opacity: 0; }}
+  @keyframes glint {{ 0%, 60%, 100% {{ opacity: 0; transform: scale(.2) rotate(0deg); }} 80% {{ opacity: 1; transform: scale(1) rotate(45deg); }} }}
+  .wave, .lens {{ transform-box: fill-box; transform-origin: center; animation-duration: {T:g}s; animation-iteration-count: infinite; opacity: 0; }}
+  .wave {{ animation-name: wave; animation-timing-function: linear; }}
+  @keyframes wave {{ {" ".join(f"{p * k:.2f}% {{ opacity: {1 if p else 0}; transform: scaleY({v}); }}" for p, v in wave_steps)} {29 * k:.2f}%, 100% {{ opacity: 0; transform: scaleY(0); }} }}
+  .lens {{ animation-name: lens; animation-timing-function: ease-out; }}
+  @keyframes lens {{ 0% {{ opacity: 0; transform: scaleY(0); }} {k:.2f}% {{ opacity: 1; transform: scaleY(1); }} {29 * k:.2f}%, 100% {{ opacity: 0; transform: scaleY(0); }} }}
+  @media (prefers-reduced-motion: reduce) {{ .float, .spin, .side, .z, .c, .front, .back, .sheen, .glint, .wave, .lens {{ animation: none; }} }}
+"""
+
 o = []
 add = o.append
+
+
+def open_face(z):
+    """Start a group drawn on the plane at depth z."""
+    add(f'<g class="z {zc(z)}"><g transform="translate({CX} 0)"><g class="spin"><g transform="translate({-CX} 0)">')
+
+
+def close_face():
+    add('</g></g></g></g>')
+
+
+def rim(href, zs, shade):
+    """The wall between the two faces of a part: its outline repeated at each depth in zs, far to near."""
+    for z in zs:
+        add(f'<g class="z {zc(z)}"><g transform="translate({CX} 0)"><g class="spin"><use xlink:href="#{href}" x="{-CX}" fill="{shade(z)}"/></g></g></g>')
+
+
+def side_wall(a, y0, y1, zr, fill, rx):
+    """What is left of a part when it is seen edge-on: the plane x = CX + a, as wide as the part is deep."""
+    inner = f'<g transform="translate({CX} 0)"><g class="side"><rect x="{zr[0]}" y="{y0:.0f}" width="{zr[1] - zr[0]}" height="{y1 - y0:.0f}" rx="{rx}" fill="{fill}"/></g></g>'
+    add(f'<g class="c {cc(a)}">{inner}</g>' if a else inner)
 
 
 def screw(x, y, r=3.4):
@@ -46,7 +136,7 @@ def glint(x, y, r, delay):
         f'L{x - r * .16:.1f} {y + r * .16:.1f} L{x - r} {y} L{x - r * .16:.1f} {y - r * .16:.1f} Z" fill="#fff"/>')
 
 
-add(f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{VB[2]}" height="{VB[3]}" viewBox="{VB[0]} {VB[1]} {VB[2]} {VB[3]}" role="img" aria-label="Animated butterscotch T-style electric guitar with a white pickguard, maple neck and chrome hardware; its strings are strummed every few seconds">
+add(f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{VB[2]}" height="{VB[3]}" viewBox="{VB[0]} {VB[1]} {VB[2]} {VB[3]}" role="img" aria-label="Butterscotch T-style electric guitar with a white pickguard, maple neck and chrome hardware, turning slowly; its strings are strummed each time it faces front">
 <defs>
   <path id="body" d="{body_d}"/>
   <path id="head" d="{head_d}"/>
@@ -62,6 +152,8 @@ add(f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1
   <linearGradient id="butter" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fbc640"/><stop offset=".5" stop-color="#f8be36"/><stop offset="1" stop-color="#f1b02b"/></linearGradient>
   <linearGradient id="maple" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#eeb748"/><stop offset=".12" stop-color="#f8c95e"/><stop offset=".88" stop-color="#f8c95e"/><stop offset="1" stop-color="#e9ae40"/></linearGradient>
   <linearGradient id="neckBack" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d79c36"/><stop offset=".3" stop-color="#f6c75c"/><stop offset=".5" stop-color="#fcd983"/><stop offset=".72" stop-color="#f3bf52"/><stop offset="1" stop-color="#cf9330"/></linearGradient>
+  <linearGradient id="sideBody" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f3bd3c"/><stop offset=".13" stop-color="#d08c17"/><stop offset=".86" stop-color="#eaab28"/><stop offset="1" stop-color="#f8c94e"/></linearGradient>
+  <linearGradient id="sideMaple" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f5c765"/><stop offset=".2" stop-color="#d39a36"/><stop offset=".85" stop-color="#ecb94f"/><stop offset="1" stop-color="#f9d079"/></linearGradient>
   <linearGradient id="headMaple" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbd27c"/><stop offset="1" stop-color="#f3bc55"/></linearGradient>
   <linearGradient id="guardFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbf9f3"/><stop offset="1" stop-color="#ece8dd"/></linearGradient>
   <linearGradient id="chromeV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcfcfc"/><stop offset=".42" stop-color="#c3c5c6"/><stop offset=".55" stop-color="#8f9193"/><stop offset=".72" stop-color="#d6d7d8"/><stop offset="1" stop-color="#f1f1f1"/></linearGradient>
@@ -80,59 +172,60 @@ add(f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1
   <filter id="b2"><feGaussianBlur stdDeviation="2"/></filter>
   <filter id="b5"><feGaussianBlur stdDeviation="5"/></filter>
 </defs>
-<style>
-  .float {{ animation: float 7s ease-in-out infinite; }}
-  @keyframes float {{ 0%, 100% {{ transform: translateY(0); }} 50% {{ transform: translateY(-7px); }} }}
-  /* one turn about the neck axis every 8 s; scaleX follows the cosine of the turn, and the back shows while it is negative */
-  .spin {{ animation: spin 8s infinite; }}
-  @keyframes spin {{
-    0%, 17.5% {{ transform: scaleX(1); animation-timing-function: cubic-bezier(.37, 0, .63, 1); }}
-    32.5% {{ transform: scaleX(-1); animation-timing-function: cubic-bezier(.37, 0, .63, 1); }}
-    47.5%, 100% {{ transform: scaleX(1); }}
-  }}
-  .front {{ animation: front 8s step-end infinite; }}
-  @keyframes front {{ 0% {{ opacity: 1; }} 25% {{ opacity: 0; }} 40%, 100% {{ opacity: 1; }} }}
-  .back {{ opacity: 0; animation: back 8s step-end infinite; }}
-  @keyframes back {{ 0% {{ opacity: 0; }} 25% {{ opacity: 1; }} 40%, 100% {{ opacity: 0; }} }}
-  .sheen {{ animation: sheen 8s ease-in-out infinite; }}
-  @keyframes sheen {{ 0%, 15% {{ transform: translateX(-420px); }} 55%, 100% {{ transform: translateX(420px); }} }}
-  .glint {{ transform-box: fill-box; transform-origin: center; animation: glint 4s ease-in-out infinite; opacity: 0; }}
-  @keyframes glint {{ 0%, 60%, 100% {{ opacity: 0; transform: scale(.2) rotate(0deg); }} 80% {{ opacity: 1; transform: scale(1) rotate(45deg); }} }}
-  .wave, .lens {{ transform-box: fill-box; transform-origin: center; animation-duration: 4s; animation-iteration-count: infinite; opacity: 0; }}
-  .wave {{ animation-name: wave; animation-timing-function: linear; }}
-  @keyframes wave {{
-    0% {{ opacity: 0; transform: scaleY(0); }} 1% {{ opacity: 1; transform: scaleY(1); }}
-    2.8% {{ transform: scaleY(-.86); }} 4.6% {{ transform: scaleY(.74); }} 6.4% {{ transform: scaleY(-.63); }} 8.2% {{ transform: scaleY(.53); }}
-    10% {{ transform: scaleY(-.44); }} 12% {{ transform: scaleY(.36); }} 14.5% {{ transform: scaleY(-.28); }} 17% {{ transform: scaleY(.2); }}
-    20% {{ transform: scaleY(-.14); }} 24% {{ opacity: 1; transform: scaleY(.08); }} 29%, 100% {{ opacity: 0; transform: scaleY(0); }}
-  }}
-  .lens {{ animation-name: lens; animation-timing-function: ease-out; }}
-  @keyframes lens {{ 0% {{ opacity: 0; transform: scaleY(0); }} 1% {{ opacity: 1; transform: scaleY(1); }} 29%, 100% {{ opacity: 0; transform: scaleY(0); }} }}
-  @media (prefers-reduced-motion: reduce) {{ .float, .spin, .front, .back, .sheen, .glint, .wave, .lens {{ animation: none; }} }}
-</style>
-<g class="float"><g transform="translate({CX} 0)"><g class="spin"><g transform="translate({-CX} 0)">
-<g class="front">
+<style>{STYLE}</style>
+<g class="float">
 ''')
 
-# ---------------------------------------------------------------- silhouettes + soft shadow
-def keys_and_buttons():                                         # tuner shafts and buttons (behind the headstock), strap buttons
+
+# ---------------------------------------------------------------- pieces shared by the front and the back
+def keys():                                                     # tuner shafts and buttons, behind the headstock
   for x, y in POSTS:
     bx, by = x - 39, y - 14
     add(f'<path d="M{x - 12:.1f} {y - 4.3:.1f} L{bx:.1f} {by:.1f}" stroke="url(#chromeV)" stroke-width="7.5"/>'
         f'<g transform="rotate(19.7 {bx:.1f} {by:.1f})"><ellipse cx="{bx:.1f}" cy="{by:.1f}" rx="12.5" ry="16.5" fill="url(#chromeV)" stroke="#77797b" stroke-width=".8"/>'
         f'<ellipse cx="{bx - 3:.1f}" cy="{by - 5:.1f}" rx="5" ry="6" fill="#fff" fill-opacity=".75"/></g>')
+
+
+def strap_buttons():
   add('<rect x="397.5" y="741" width="9" height="9" fill="#9a9c9e"/><ellipse cx="402" cy="741.5" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>')
   add('<rect x="533" y="1414" width="9" height="9" fill="#9a9c9e"/><ellipse cx="537.5" cy="1425.5" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>')
 
 
-add('<g filter="url(#drop)">')
-keys_and_buttons()
-add('<use xlink:href="#body" fill="url(#butter)"/>')
-add('<use xlink:href="#neck" fill="url(#maple)"/>')
-add('<use xlink:href="#head" fill="url(#headMaple)"/>')
-add('</g>')
+def head_finish():
+  add('<g clip-path="url(#headClip)">')
+  for i in range(8):
+    x = 470 + i * 15 + random.uniform(-3, 3)
+    add(f'<path d="M{x:.0f} 240 C{x + 14:.0f} 150 {x + 30:.0f} 60 {x + 44:.0f} -30" fill="none" stroke="#c98f2a" stroke-opacity="{random.uniform(.08, .2):.2f}" stroke-width="{random.uniform(.7, 1.8):.1f}"/>')
+  add('<use xlink:href="#head" fill="none" stroke="#c98a22" stroke-opacity=".5" stroke-width="12" filter="url(#b2)" transform="translate(-4 -3)"/>')
+  add('<use xlink:href="#head" fill="none" stroke="#fff6d8" stroke-opacity=".85" stroke-width="3.5" filter="url(#b2)" transform="translate(4 4)"/>')
+  add('</g>')
+  add('<use xlink:href="#head" fill="none" stroke="#b9801c" stroke-opacity=".75" stroke-width="1"/>')
+
+
+# ================================================================ side walls, seen when the guitar is edge-on
+for a in A_BODY:
+    s = span(back_d, CX + a)
+    if s and s[1] - s[0] > 60:
+        side_wall(a, s[0] + 3, s[1] - 3, Z_BODY, "url(#sideBody)", 5)
+side_wall(0, NUT, FB_END, Z_NECK, "url(#sideMaple)", 3)
+for a in A_HEAD:
+    s = span(head_d, CX + a)
+    if s and s[1] - s[0] > 30:
+        side_wall(a, s[0] + 2, s[1] - 2, Z_HEAD, "url(#sideMaple)", 3)
+
+# ================================================================ front of the guitar
+add('<g class="front">')
+open_face(16)
+keys()
+close_face()
+open_face(0)
+strap_buttons()
+close_face()
 
 # ---------------------------------------------------------------- body: grain, rolled edge, gloss
+rim("bodyBack", BODY_L, body_shade)
+open_face(Z_BODY[1])
+add('<use xlink:href="#body" fill="url(#butter)"/>')
 add('<g clip-path="url(#bodyClip)">')
 for i in range(22):
     x = 275 + i * 24 + random.uniform(-8, 8)
@@ -152,43 +245,6 @@ add('<g clip-path="url(#guardClip)"><use xlink:href="#guard" fill="none" stroke=
 add('<use xlink:href="#guard" fill="none" stroke="#a8a394" stroke-opacity=".7" stroke-width=".8"/>')
 for x, y in [(710, 793), (473, 823), (588, 884), (415, 933), (710, 910), (420, 1063), (621, 1063), (708, 1063)]:
     screw(x, y)
-
-# ---------------------------------------------------------------- neck: maple board, frets, dots, nut
-add('<g filter="url(#lift)"><use xlink:href="#neck" fill="url(#maple)"/></g>')   # over the pickguard and the neck pocket
-add('<g clip-path="url(#neckClip)">')
-for i in range(7):
-    x = CX - 36 + i * 12 + random.uniform(-3, 3)
-    add(f'<path d="M{x:.0f} 230 C{x + random.uniform(-3, 3):.0f} 460 {x + random.uniform(-3, 3):.0f} 700 {x + random.uniform(-4, 4):.0f} 905" fill="none" stroke="#c98f2a" stroke-opacity="{random.uniform(.08, .18):.2f}" stroke-width="{random.uniform(.7, 1.8):.1f}"/>')
-add('</g>')
-add('<use xlink:href="#neck" fill="none" stroke="#b9801c" stroke-opacity=".75" stroke-width="1"/>')
-for n in (3, 5, 7, 9, 15, 17, 19, 21):
-    add(f'<circle cx="{CX}" cy="{(fret(n) + fret(n - 1)) / 2:.1f}" r="{5 if n < 21 else 4.4}" fill="#15130f"/>')
-y12 = (fret(12) + fret(11)) / 2
-add(f'<circle cx="{CX - 15}" cy="{y12:.1f}" r="5" fill="#15130f"/><circle cx="{CX + 15}" cy="{y12:.1f}" r="5" fill="#15130f"/>')
-for n in range(1, 22):
-    y, w = fret(n), half_w(fret(n))
-    add(f'<rect x="{CX - w + .6:.1f}" y="{y + 1.2:.1f}" width="{2 * w - 1.2:.1f}" height="1.6" fill="#7a5a12" fill-opacity=".35"/>'
-        f'<rect x="{CX - w + .4:.1f}" y="{y - 1.5:.1f}" width="{2 * w - .8:.1f}" height="3" rx="1" fill="url(#fretm)"/>')
-add(f'<rect x="{CX - half_w(NUT) - .5:.1f}" y="{NUT - 5}" width="{2 * half_w(NUT) + 1:.1f}" height="9" rx="1.5" fill="#f7f3e6" stroke="#b9b29c" stroke-width=".6"/>'
-    f'<rect x="{CX - half_w(NUT):.1f}" y="{NUT + 4}" width="{2 * half_w(NUT):.1f}" height="2.5" fill="#7a5a12" fill-opacity=".3"/>')
-
-# ---------------------------------------------------------------- headstock: grain, gloss, tuner posts
-def head_finish():
-  add('<g clip-path="url(#headClip)">')
-  for i in range(8):
-    x = 470 + i * 15 + random.uniform(-3, 3)
-    add(f'<path d="M{x:.0f} 240 C{x + 14:.0f} 150 {x + 30:.0f} 60 {x + 44:.0f} -30" fill="none" stroke="#c98f2a" stroke-opacity="{random.uniform(.08, .2):.2f}" stroke-width="{random.uniform(.7, 1.8):.1f}"/>')
-  add('<use xlink:href="#head" fill="none" stroke="#c98a22" stroke-opacity=".5" stroke-width="12" filter="url(#b2)" transform="translate(-4 -3)"/>')
-  add('<use xlink:href="#head" fill="none" stroke="#fff6d8" stroke-opacity=".85" stroke-width="3.5" filter="url(#b2)" transform="translate(4 4)"/>')
-  add('</g>')
-  add('<use xlink:href="#head" fill="none" stroke="#b9801c" stroke-opacity=".75" stroke-width="1"/>')
-
-
-head_finish()
-for x, y in POSTS:
-    add(f'<g filter="url(#lift)"><circle cx="{x:.1f}" cy="{y}" r="11.5" fill="url(#chromeH)" stroke="#6f7173" stroke-width=".7"/></g>'
-        f'<circle cx="{x:.1f}" cy="{y}" r="8" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1"/>'
-        f'<circle cx="{x:.1f}" cy="{y}" r="6.2" fill="url(#dome)" stroke="#6f7173" stroke-width=".6"/>')
 
 # ---------------------------------------------------------------- neck pickup
 add('<g filter="url(#lift)"><rect x="472" y="907" width="118" height="24" rx="10" fill="url(#chromeV)" stroke="#77797b" stroke-width=".8"/></g>')
@@ -232,6 +288,39 @@ for cy in (1171.5, 1266.5):
         f'<circle cx="{cx}" cy="{cy - 1.5}" r="16" fill="url(#knobTop)" stroke="#7b7d7f" stroke-width=".6"/>'
         f'<path d="M{cx} {cy - 1.5} L{cx - 6} {cy - 17.2} A16 16 0 0 1 {cx + 6} {cy - 17.2} Z M{cx} {cy - 1.5} L{cx + 6} {cy + 14.2} A16 16 0 0 1 {cx - 6} {cy + 14.2} Z" fill="#fff" fill-opacity=".55"/>'
         f'<path d="M{cx} {cy - 1.5} L{cx - 15.7} {cy - 5} A16 16 0 0 0 {cx - 15.7} {cy + 2} Z M{cx} {cy - 1.5} L{cx + 15.7} {cy - 5} A16 16 0 0 1 {cx + 15.7} {cy + 2} Z" fill="#6d6f71" fill-opacity=".28"/>')
+close_face()
+
+# ---------------------------------------------------------------- headstock: tuner posts
+rim("head", HEAD_L, head_shade)
+open_face(Z_HEAD[1])
+add('<use xlink:href="#head" fill="url(#headMaple)"/>')
+head_finish()
+for x, y in POSTS:
+    add(f'<g filter="url(#lift)"><circle cx="{x:.1f}" cy="{y}" r="11.5" fill="url(#chromeH)" stroke="#6f7173" stroke-width=".7"/></g>'
+        f'<circle cx="{x:.1f}" cy="{y}" r="8" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1"/>'
+        f'<circle cx="{x:.1f}" cy="{y}" r="6.2" fill="url(#dome)" stroke="#6f7173" stroke-width=".6"/>')
+close_face()
+
+# ---------------------------------------------------------------- neck: maple board, frets, dots, nut
+rim("neck", NECK_L, neck_shade)
+open_face(Z_NECK[1])
+add('<g filter="url(#lift)"><use xlink:href="#neck" fill="url(#maple)"/></g>')   # over the pickguard and the neck pocket
+add('<g clip-path="url(#neckClip)">')
+for i in range(7):
+    x = CX - 36 + i * 12 + random.uniform(-3, 3)
+    add(f'<path d="M{x:.0f} 230 C{x + random.uniform(-3, 3):.0f} 460 {x + random.uniform(-3, 3):.0f} 700 {x + random.uniform(-4, 4):.0f} 905" fill="none" stroke="#c98f2a" stroke-opacity="{random.uniform(.08, .18):.2f}" stroke-width="{random.uniform(.7, 1.8):.1f}"/>')
+add('</g>')
+add('<use xlink:href="#neck" fill="none" stroke="#b9801c" stroke-opacity=".75" stroke-width="1"/>')
+for n in (3, 5, 7, 9, 15, 17, 19, 21):
+    add(f'<circle cx="{CX}" cy="{(fret(n) + fret(n - 1)) / 2:.1f}" r="{5 if n < 21 else 4.4}" fill="#15130f"/>')
+y12 = (fret(12) + fret(11)) / 2
+add(f'<circle cx="{CX - 15}" cy="{y12:.1f}" r="5" fill="#15130f"/><circle cx="{CX + 15}" cy="{y12:.1f}" r="5" fill="#15130f"/>')
+for n in range(1, 22):
+    y, w = fret(n), half_w(fret(n))
+    add(f'<rect x="{CX - w + .6:.1f}" y="{y + 1.2:.1f}" width="{2 * w - 1.2:.1f}" height="1.6" fill="#7a5a12" fill-opacity=".35"/>'
+        f'<rect x="{CX - w + .4:.1f}" y="{y - 1.5:.1f}" width="{2 * w - .8:.1f}" height="3" rx="1" fill="url(#fretm)"/>')
+add(f'<rect x="{CX - half_w(NUT) - .5:.1f}" y="{NUT - 5}" width="{2 * half_w(NUT) + 1:.1f}" height="9" rx="1.5" fill="#f7f3e6" stroke="#b9b29c" stroke-width=".6"/>'
+    f'<rect x="{CX - half_w(NUT):.1f}" y="{NUT + 4}" width="{2 * half_w(NUT):.1f}" height="2.5" fill="#7a5a12" fill-opacity=".3"/>')
 
 # ---------------------------------------------------------------- strings: saddle -> nut -> tuner post
 for i in range(6):
@@ -244,7 +333,7 @@ for i in range(6):
     ax, ay, bx, by = STR_SADDLE[i], SADDLE, STR_NUT[i], NUT
     length, ang = math.hypot(bx - ax, by - ay), math.degrees(math.atan2(by - ay, bx - ax))
     amp = 4.6 - i * .42
-    dl = f"{i * .06:.2f}s"
+    dl = f"{i * .06 - T / 12:.2f}s"                  # strummed as the front swings into view
     add(f'<g transform="translate({ax:.1f} {ay}) rotate({ang:.3f})">'
         f'<path class="lens" style="animation-delay:{dl}" d="M0 0 Q{length / 2:.1f} {-2 * amp:.2f} {length:.1f} 0 Q{length / 2:.1f} {2 * amp:.2f} 0 0 Z" fill="#77776f" fill-opacity=".3"/>'
         f'<g class="wave" style="animation-delay:{dl}"><path d="M0 0 Q{length / 2:.1f} {-2 * amp:.2f} {length:.1f} 0" fill="none" stroke="#6f6f6b" stroke-width="{GAUGE[i]:.2f}"/>'
@@ -254,24 +343,38 @@ for i in range(6):
 glint(POSTS[5][0] - 42, POSTS[5][1] - 20, 13, 0)
 glint(469, 1062, 11, 1.4)
 glint(668, 1161, 12, 2.6)
-
+close_face()
 add('</g>')
 
-# ================================================================ back of the guitar (seen mirrored while the spin faces away)
+# ================================================================ back of the guitar
 add('<g class="back">')
-add('<g filter="url(#drop)">')
-keys_and_buttons()
-add('<use xlink:href="#neck" fill="url(#neckBack)"/>')
+open_face(16)
+keys()
+close_face()
+open_face(0)
+strap_buttons()
+close_face()
+
+rim("head", HEAD_L[::-1], head_shade)
+open_face(Z_HEAD[0])
 add('<use xlink:href="#head" fill="url(#headMaple)"/>')
-add('</g>')
-add(f'<rect x="{CX - 2.8}" y="262" width="5.6" height="520" rx="2.8" fill="#5b3414"/><rect x="{CX - 2.8}" y="262" width="1.4" height="520" rx=".7" fill="#fff" fill-opacity=".18"/>')
-add('<use xlink:href="#neck" fill="none" stroke="#b9801c" stroke-opacity=".75" stroke-width="1"/>')
 head_finish()
 for x, y in POSTS:                                              # tuner housings
     add(f'<g transform="rotate(19.1 {x:.1f} {y})" filter="url(#lift)"><rect x="{x - 12.5:.1f}" y="{y - 16}" width="25" height="32" rx="3.5" fill="url(#plate)" stroke="#77797b" stroke-width=".8"/>'
         f'<rect x="{x - 9.5:.1f}" y="{y - 13}" width="19" height="26" rx="2" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1"/>'
         f'<circle cx="{x:.1f}" cy="{y}" r="5.2" fill="url(#dome)" stroke="#77797b" stroke-width=".5"/></g>')
-add('<g filter="url(#drop)"><use xlink:href="#bodyBack" fill="url(#butter)"/></g>')
+close_face()
+
+rim("neck", NECK_L[::-1], neck_shade)
+open_face(Z_NECK[0])
+add('<use xlink:href="#neck" fill="url(#neckBack)"/>')
+add(f'<rect x="{CX - 2.8}" y="262" width="5.6" height="520" rx="2.8" fill="#5b3414"/><rect x="{CX - 2.8}" y="262" width="1.4" height="520" rx=".7" fill="#fff" fill-opacity=".18"/>')
+add('<use xlink:href="#neck" fill="none" stroke="#b9801c" stroke-opacity=".75" stroke-width="1"/>')
+close_face()
+
+rim("bodyBack", BODY_L[::-1], body_shade)
+open_face(Z_BODY[0])
+add('<use xlink:href="#bodyBack" fill="url(#butter)"/>')
 add('<g clip-path="url(#bodyBackClip)">')
 for i in range(22):
     x = 275 + i * 24 + random.uniform(-8, 8)
@@ -288,7 +391,8 @@ for dx in (-25, 25):                                            # neck plate scr
         screw(CX + dx, y, 5)
 for x in STR_SADDLE:                                            # string ferrules
     add(f'<circle cx="{x:.1f}" cy="1201" r="6.2" fill="#000" fill-opacity=".25"/><circle cx="{x:.1f}" cy="1200" r="5.6" fill="url(#dome)" stroke="#6f7173" stroke-width=".6"/><circle cx="{x:.1f}" cy="1200" r="2.3" fill="#2a2a2b"/>')
+close_face()
 add('</g>')
 
-add('</g></g></g></g></svg>')
+add('</g></svg>')
 open(sys.argv[1], "w", encoding="utf-8").write("\n".join(o) + "\n")
