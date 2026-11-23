@@ -1,260 +1,236 @@
 #!/usr/bin/env python3
-"""Draw assets/guitar.svg: the animated 2D gold T-style guitar on the profile README.
+"""Draw assets/guitar.svg: the animated butterscotch T-style guitar on the profile README.
 
     python3 scripts/guitar.py assets/guitar.svg
 
-Geometry is in millimetres (x toward the headstock, y up), on a real
-648 mm scale with 22 frets, and is scaled and tilted into the canvas.
+Body, headstock and pickguard outlines come from scripts/guitar_outline.json.
+Frets are placed with the 12th-root-of-two rule between the nut and the saddles.
 """
+import json
 import math
+import os
 import random
 import sys
 
-random.seed(5)
-W, H = 1200, 540
-K = 1.1                                    # px per mm
-NUT, SCALE, FB_END, SADDLE = 594.0, 648.0, 128.0, -54.0
-fret = lambda n: NUT - SCALE * (1 - 2 ** (-n / 12))
-half_w = lambda x: 28 + (21.4 - 28) * (x - FB_END) / (NUT - FB_END)
+random.seed(8)
+HERE = os.path.dirname(os.path.abspath(__file__))
+O = json.load(open(os.path.join(HERE, "guitar_outline.json")))
 
-BODY = [(188, 28), (193, 101), (164, 141), (133, 150), (48, 157), (-32, 160), (-120, 156), (-165, 141), (-190, 80),
-        (-195, 0), (-190, -82), (-169, -143), (-120, -160), (-32, -163), (48, -161), (133, -154), (176, -138),
-        (189, -122), (186, -108), (174, -100), (150, -90), (130, -70), (126, -50), (133, -28)]
-GUARD = [(170, 27), (168, 48), (146, 72), (119, 81), (60, 82), (14, 80), (11, 40), (10, -18), (10, -80),
-         (11, -116), (48, -121), (110, -125), (146, -123), (170, -118), (177, -112), (170, -105), (148, -96),
-         (127, -76), (120, -50), (123, -27)]
-HEAD = [(594, -21.4), (630, -23), (690, -25), (740, -22), (772, -8), (784, 12), (780, 34), (762, 44), (700, 46),
-        (650, 44), (624, 37), (606, 26), (594, 21.4)]
-POSTS = [(625 + 25 * i, 30) for i in range(6)]
+VB = (232, -44, 594, 1500)                 # viewBox: x, y, width, height
+CX = 531.75                                # centre line of the neck
+NUT, SADDLE, FB_END = 236.0, 1173.0, 900.0
+SCALE = SADDLE - NUT
+fret = lambda n: NUT + SCALE * (1 - 2 ** (-n / 12))
+half_w = lambda y: 32.75 + (44.7 - 32.75) * (y - NUT) / (FB_END - NUT)
+STR_SADDLE = [489.5 + 16.9 * i for i in range(6)]              # low E on the left
+STR_NUT = [CX - 26.5 + 10.6 * i for i in range(6)]
+POSTS = [(504 + 11.06 * i, 175 - 32 * i) for i in range(6)]    # low E nearest the nut
+GAUGE = [2.5, 2.2, 1.9, 1.5, 1.25, 1.05]
 
-
-def spline(pts, per=8):
-    """Centripetal Catmull-Rom through pts (open)."""
-    p = [(2 * pts[0][0] - pts[1][0], 2 * pts[0][1] - pts[1][1])] + pts + [(2 * pts[-1][0] - pts[-2][0], 2 * pts[-1][1] - pts[-2][1])]
-    out = []
-    for i in range(1, len(p) - 2):
-        p0, p1, p2, p3 = p[i - 1], p[i], p[i + 1], p[i + 2]
-        t0 = 0.0
-        t1 = t0 + math.dist(p0, p1) ** 0.5
-        t2 = t1 + math.dist(p1, p2) ** 0.5
-        t3 = t2 + math.dist(p2, p3) ** 0.5
-        for s in range(per):
-            t = t1 + (t2 - t1) * s / per
-            mix = lambda a, b, ta, tb: tuple(((tb - t) * u + (t - ta) * v) / (tb - ta) for u, v in zip(a, b))
-            a1, a2, a3 = mix(p0, p1, t0, t1), mix(p1, p2, t1, t2), mix(p2, p3, t2, t3)
-            out.append(mix(mix(a1, a2, t0, t2), mix(a2, a3, t1, t3), t1, t2))
-    out.append(pts[-1])
-    return out
-
-
-def path(pts, close=True):
-    return "M" + " L".join(f"{x:.1f} {-y:.1f}" for x, y in pts) + (" Z" if close else "")
-
-
-body_d = path(spline(BODY) + [(190, -28), (190, 28)])
-guard_d = path(spline(GUARD) + [(123, 24), (170, 24)])
-head_d = path(spline(HEAD))
-fb = [(FB_END, half_w(FB_END)), (NUT, half_w(NUT)), (NUT, -half_w(NUT)), (FB_END, -half_w(FB_END))]
-fb_d = path(fb)
-neck_d = path([(118, half_w(FB_END) + .9), (NUT, half_w(NUT) + .9), (NUT, -half_w(NUT) - .9), (118, -half_w(FB_END) - .9)])
+poly = lambda pts: "M" + " L".join(f"{x:.1f} {y:.1f}" for x, y in pts) + " Z"
+body_d, head_d, guard_d = O["body"], O["head"], O["guard"]
+neck_d = poly([(CX - half_w(NUT), NUT - 2), (CX + half_w(NUT), NUT - 2), (CX + half_w(FB_END), FB_END - 3), (CX + half_w(FB_END) - 3, FB_END),
+               (CX - half_w(FB_END) + 3, FB_END), (CX - half_w(FB_END), FB_END - 3)])
 
 o = []
 add = o.append
-add(f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="Animated gold T-style electric guitar with a dark brushed pickguard; its strings are strummed every few seconds">
+
+
+def screw(x, y, r=3.4):
+    add(f'<circle cx="{x}" cy="{y + .8}" r="{r + .4}" fill="#000" fill-opacity=".22"/><circle cx="{x}" cy="{y}" r="{r}" fill="url(#dome)" stroke="#7d7f81" stroke-width=".5"/>'
+        f'<path d="M{x - r * .6:.1f} {y - r * .6:.1f} L{x + r * .6:.1f} {y + r * .6:.1f} M{x + r * .6:.1f} {y - r * .6:.1f} L{x - r * .6:.1f} {y + r * .6:.1f}" stroke="#6f7173" stroke-width=".7"/>')
+
+
+def glint(x, y, r, delay):
+    add(f'<path class="glint" style="animation-delay:{delay}s" d="M{x} {y - r} L{x + r * .16:.1f} {y - r * .16:.1f} L{x + r} {y} L{x + r * .16:.1f} {y + r * .16:.1f} L{x} {y + r} '
+        f'L{x - r * .16:.1f} {y + r * .16:.1f} L{x - r} {y} L{x - r * .16:.1f} {y - r * .16:.1f} Z" fill="#fff"/>')
+
+
+add(f'''<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{VB[2]}" height="{VB[3]}" viewBox="{VB[0]} {VB[1]} {VB[2]} {VB[3]}" role="img" aria-label="Animated butterscotch T-style electric guitar with a white pickguard, maple neck and chrome hardware; its strings are strummed every few seconds">
 <defs>
-  <radialGradient id="stage" cx=".5" cy=".46" r=".75"><stop offset="0" stop-color="#2a1c0b"/><stop offset=".5" stop-color="#15100b"/><stop offset="1" stop-color="#0a090c"/></radialGradient>
-  <radialGradient id="halo"><stop offset="0" stop-color="#ffb11f" stop-opacity=".5"/><stop offset="1" stop-color="#ffb11f" stop-opacity="0"/></radialGradient>
-  <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="1" fill="#ffd27a" fill-opacity=".07"/></pattern>
+  <path id="body" d="{body_d}"/>
+  <path id="head" d="{head_d}"/>
+  <path id="guard" d="{guard_d}"/>
+  <path id="neck" d="{neck_d}"/>
+  <clipPath id="bodyClip"><use xlink:href="#body"/></clipPath>
+  <clipPath id="headClip"><use xlink:href="#head"/></clipPath>
+  <clipPath id="guardClip"><use xlink:href="#guard"/></clipPath>
+  <clipPath id="neckClip"><use xlink:href="#neck"/></clipPath>
 
-  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6b31c"/><stop offset=".45" stop-color="#e99a0a"/><stop offset="1" stop-color="#cf7c00"/></linearGradient>
-  <radialGradient id="goldHi" cx=".25" cy=".8" r=".55"><stop offset="0" stop-color="#f3d23a" stop-opacity=".75"/><stop offset=".6" stop-color="#f0c020" stop-opacity=".18"/><stop offset="1" stop-color="#f0c020" stop-opacity="0"/></radialGradient>
-  <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff6d0" stop-opacity="0"/><stop offset=".5" stop-color="#fff6d0" stop-opacity=".5"/><stop offset="1" stop-color="#fff6d0" stop-opacity="0"/></linearGradient>
-  <filter id="flake" x="0" y="0" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="4" result="n"/>
-    <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 .93  0 0 0 0 .62  0 0 0 9 -5.75"/>
-  </filter>
-  <filter id="flakeDark" x="0" y="0" width="100%" height="100%">
-    <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="9" result="n"/>
-    <feColorMatrix in="n" type="matrix" values="0 0 0 0 .45  0 0 0 0 .2  0 0 0 0 0  0 0 0 8 -4.6"/>
-  </filter>
+  <linearGradient id="butter" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fbc640"/><stop offset=".5" stop-color="#f8be36"/><stop offset="1" stop-color="#f1b02b"/></linearGradient>
+  <linearGradient id="maple" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#eeb748"/><stop offset=".12" stop-color="#f8c95e"/><stop offset=".88" stop-color="#f8c95e"/><stop offset="1" stop-color="#e9ae40"/></linearGradient>
+  <linearGradient id="headMaple" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbd27c"/><stop offset="1" stop-color="#f3bc55"/></linearGradient>
+  <linearGradient id="guardFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbf9f3"/><stop offset="1" stop-color="#ece8dd"/></linearGradient>
+  <linearGradient id="chromeV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fcfcfc"/><stop offset=".42" stop-color="#c3c5c6"/><stop offset=".55" stop-color="#8f9193"/><stop offset=".72" stop-color="#d6d7d8"/><stop offset="1" stop-color="#f1f1f1"/></linearGradient>
+  <linearGradient id="chromeH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f6f6f6"/><stop offset=".4" stop-color="#b9bbbc"/><stop offset=".6" stop-color="#8f9193"/><stop offset="1" stop-color="#e4e5e5"/></linearGradient>
+  <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eeeeee"/><stop offset=".5" stop-color="#cfd0d0"/><stop offset="1" stop-color="#b9babb"/></linearGradient>
+  <linearGradient id="plateIn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d2d3d3"/><stop offset="1" stop-color="#e3e4e4"/></linearGradient>
+  <radialGradient id="dome" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#c2c4c5"/><stop offset="1" stop-color="#77797b"/></radialGradient>
+  <radialGradient id="knobTop" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".6" stop-color="#d0d1d2"/><stop offset="1" stop-color="#a3a5a6"/></radialGradient>
+  <linearGradient id="fretm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdfdfb"/><stop offset=".5" stop-color="#cfd0ce"/><stop offset="1" stop-color="#8e8f8d"/></linearGradient>
+  <linearGradient id="pickup" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3a3c"/><stop offset=".3" stop-color="#19191a"/><stop offset="1" stop-color="#0b0b0c"/></linearGradient>
+  <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".42"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
 
-  <linearGradient id="guard" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5a5d64"/><stop offset=".5" stop-color="#3f4248"/><stop offset="1" stop-color="#4c4f56"/></linearGradient>
-  <pattern id="brush" width="170" height="7" patternUnits="userSpaceOnUse">
-    <rect x="0" y="0.6" width="120" height=".5" fill="#fff" fill-opacity=".10"/><rect x="60" y="2.1" width="110" height=".4" fill="#000" fill-opacity=".22"/>
-    <rect x="20" y="3.4" width="90" height=".5" fill="#fff" fill-opacity=".07"/><rect x="0" y="4.8" width="150" height=".4" fill="#000" fill-opacity=".16"/>
-    <rect x="90" y="5.9" width="80" height=".5" fill="#fff" fill-opacity=".09"/>
-  </pattern>
-  <linearGradient id="black" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34363c"/><stop offset=".35" stop-color="#121316"/><stop offset="1" stop-color="#060607"/></linearGradient>
-  <radialGradient id="knob" cx=".38" cy=".32" r=".8"><stop offset="0" stop-color="#5b5e66"/><stop offset=".4" stop-color="#1c1d21"/><stop offset="1" stop-color="#050506"/></radialGradient>
-  <linearGradient id="brass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f5dd96"/><stop offset=".5" stop-color="#cfa54a"/><stop offset="1" stop-color="#8b6418"/></linearGradient>
-  <linearGradient id="champ" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#a39566"/><stop offset=".3" stop-color="#f6efd0"/><stop offset=".6" stop-color="#cdbf8e"/><stop offset="1" stop-color="#8f8050"/></linearGradient>
-  <linearGradient id="ebony" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2420"/><stop offset=".5" stop-color="#171210"/><stop offset="1" stop-color="#0e0b0a"/></linearGradient>
-  <linearGradient id="fretm" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8d929c"/><stop offset=".45" stop-color="#f7f8fb"/><stop offset="1" stop-color="#70757f"/></linearGradient>
-  <linearGradient id="maple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9c68a"/><stop offset=".6" stop-color="#d7ad6c"/><stop offset="1" stop-color="#b98a4a"/></linearGradient>
-  <linearGradient id="eq" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c26a00"/><stop offset="1" stop-color="#ffd36b"/></linearGradient>
-
-  <filter id="drop" x="-10%" y="-20%" width="120%" height="150%"><feDropShadow dx="0" dy="12" stdDeviation="11" flood-color="#000" flood-opacity=".65"/></filter>
-  <filter id="small" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="1.2" stdDeviation="1.2" flood-color="#000" flood-opacity=".55"/></filter>
-  <filter id="blur3"><feGaussianBlur stdDeviation="3"/></filter>
-  <filter id="blur1" x="-5%" y="-300%" width="110%" height="700%"><feGaussianBlur stdDeviation="1.1"/></filter>
-  <clipPath id="bodyClip"><path d="{body_d}"/></clipPath>
-  <clipPath id="guardClip"><path d="{guard_d}"/></clipPath>
-  <clipPath id="headClip"><path d="{head_d}"/></clipPath>
+  <filter id="drop" x="-15%" y="-5%" width="130%" height="112%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity=".28"/></filter>
+  <filter id="lift" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="1.6" stdDeviation="1.6" flood-color="#3a2a00" flood-opacity=".4"/></filter>
+  <filter id="b1"><feGaussianBlur stdDeviation="1"/></filter>
+  <filter id="b2"><feGaussianBlur stdDeviation="2"/></filter>
+  <filter id="b5"><feGaussianBlur stdDeviation="5"/></filter>
 </defs>
 <style>
   .float {{ animation: float 7s ease-in-out infinite; }}
-  @keyframes float {{ 0%, 100% {{ transform: translateY(0); }} 50% {{ transform: translateY(-6px); }} }}
-  .halo {{ animation: halo 3.6s ease-out infinite; }}
-  @keyframes halo {{ 0%, 100% {{ opacity: .45; }} 3% {{ opacity: 1; }} 40% {{ opacity: .5; }} }}
-  .sheen {{ animation: sheen 7s ease-in-out infinite; }}
-  @keyframes sheen {{ 0%, 12% {{ transform: translateX(-330px); }} 55%, 100% {{ transform: translateX(330px); }} }}
-  .tw {{ animation: tw 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }}
-  @keyframes tw {{ 0%, 100% {{ opacity: 0; transform: scale(.3) rotate(0deg); }} 50% {{ opacity: 1; transform: scale(1) rotate(45deg); }} }}
-  .wave, .lens {{ transform-box: fill-box; transform-origin: center; animation-duration: 3.6s; animation-iteration-count: infinite; }}
-  .wave {{ animation-name: wave; animation-timing-function: linear; opacity: 0; }}
+  @keyframes float {{ 0%, 100% {{ transform: translateY(0); }} 50% {{ transform: translateY(-7px); }} }}
+  .sheen {{ animation: sheen 8s ease-in-out infinite; }}
+  @keyframes sheen {{ 0%, 15% {{ transform: translateX(-420px); }} 55%, 100% {{ transform: translateX(420px); }} }}
+  .glint {{ transform-box: fill-box; transform-origin: center; animation: glint 4s ease-in-out infinite; opacity: 0; }}
+  @keyframes glint {{ 0%, 60%, 100% {{ opacity: 0; transform: scale(.2) rotate(0deg); }} 80% {{ opacity: 1; transform: scale(1) rotate(45deg); }} }}
+  .wave, .lens {{ transform-box: fill-box; transform-origin: center; animation-duration: 4s; animation-iteration-count: infinite; opacity: 0; }}
+  .wave {{ animation-name: wave; animation-timing-function: linear; }}
   @keyframes wave {{
     0% {{ opacity: 0; transform: scaleY(0); }} 1% {{ opacity: 1; transform: scaleY(1); }}
-    3% {{ transform: scaleY(-.86); }} 5% {{ transform: scaleY(.74); }} 7% {{ transform: scaleY(-.63); }} 9% {{ transform: scaleY(.53); }}
-    11% {{ transform: scaleY(-.44); }} 13.5% {{ transform: scaleY(.36); }} 16% {{ transform: scaleY(-.28); }} 19% {{ transform: scaleY(.2); }}
-    22% {{ transform: scaleY(-.14); }} 26% {{ opacity: 1; transform: scaleY(.08); }} 31%, 100% {{ opacity: 0; transform: scaleY(0); }}
+    2.8% {{ transform: scaleY(-.86); }} 4.6% {{ transform: scaleY(.74); }} 6.4% {{ transform: scaleY(-.63); }} 8.2% {{ transform: scaleY(.53); }}
+    10% {{ transform: scaleY(-.44); }} 12% {{ transform: scaleY(.36); }} 14.5% {{ transform: scaleY(-.28); }} 17% {{ transform: scaleY(.2); }}
+    20% {{ transform: scaleY(-.14); }} 24% {{ opacity: 1; transform: scaleY(.08); }} 29%, 100% {{ opacity: 0; transform: scaleY(0); }}
   }}
-  .lens {{ animation-name: lens; animation-timing-function: ease-out; opacity: 0; }}
-  @keyframes lens {{ 0% {{ opacity: 0; transform: scaleY(0); }} 1% {{ opacity: .55; transform: scaleY(1); }} 31%, 100% {{ opacity: 0; transform: scaleY(0); }} }}
-  .pole {{ animation: pole 3.6s ease-out infinite; }}
-  @keyframes pole {{ 0%, 100% {{ fill: #cdbf8e; }} 2% {{ fill: #fff3c4; }} 30% {{ fill: #cdbf8e; }} }}
-  .bar {{ transform-box: fill-box; transform-origin: bottom; animation: bar 1s ease-in-out infinite alternate; }}
-  @keyframes bar {{ from {{ transform: scaleY(.12); }} to {{ transform: scaleY(1); }} }}
-  @media (prefers-reduced-motion: reduce) {{ .float, .halo, .sheen, .tw, .wave, .lens, .pole, .bar {{ animation: none; }} }}
+  .lens {{ animation-name: lens; animation-timing-function: ease-out; }}
+  @keyframes lens {{ 0% {{ opacity: 0; transform: scaleY(0); }} 1% {{ opacity: 1; transform: scaleY(1); }} 29%, 100% {{ opacity: 0; transform: scaleY(0); }} }}
+  @media (prefers-reduced-motion: reduce) {{ .float, .sheen, .glint, .wave, .lens {{ animation: none; }} }}
 </style>
-<rect width="{W}" height="{H}" rx="20" fill="url(#stage)"/>
-<rect width="{W}" height="{H}" rx="20" fill="url(#dots)"/>
-<ellipse class="halo" cx="440" cy="270" rx="520" ry="250" fill="url(#halo)" opacity=".45"/>
-<rect x=".5" y=".5" width="{W - 1}" height="{H - 1}" rx="20" fill="none" stroke="#ffcf70" stroke-opacity=".16"/>
+<g class="float">
 ''')
 
-# equalizer along the bottom
-n = 84
-for k in range(n):
-    bw = (W - 140) / n
-    h = 6 + 24 * abs(math.sin(k * 0.33)) * random.uniform(.45, 1)
-    add(f'<rect class="bar" x="{70 + k * bw:.1f}" y="{518 - h:.1f}" width="{bw - 4:.1f}" height="{h:.1f}" rx="1.5" fill="url(#eq)" fill-opacity=".55" '
-        f'style="animation-duration:{random.uniform(.45, 1.2):.2f}s;animation-delay:-{random.uniform(0, 1.2):.2f}s"/>')
-
-add('<g class="float">')
-add(f'<g transform="translate(600 246) rotate(-4) scale({K}) translate(-294.5 0)">')
-
-# ---- silhouettes with a soft drop shadow
+# ---------------------------------------------------------------- silhouettes + soft shadow
 add('<g filter="url(#drop)">')
-for x, y in POSTS:                                              # tuner keys behind the headstock
-    add(f'<rect x="{x - 1.8}" y="{-(y + 22):.1f}" width="3.6" height="10" fill="#3a3c42"/>'
-        f'<rect x="{x - 5.5}" y="{-(y + 33):.1f}" width="11" height="14" rx="5" fill="url(#black)" stroke="#5a5d64" stroke-width=".6"/>')
-add(f'<path d="{body_d}" fill="url(#gold)"/>')
-add(f'<path d="{neck_d}" fill="#c99b58"/>')
-add(f'<path d="{head_d}" fill="url(#maple)"/>')
+for x, y in POSTS:                                              # tuner shafts and buttons, behind the headstock
+    bx, by = x - 39, y - 14
+    add(f'<path d="M{x - 12:.1f} {y - 4.3:.1f} L{bx:.1f} {by:.1f}" stroke="url(#chromeV)" stroke-width="7.5"/>'
+        f'<g transform="rotate(19.7 {bx:.1f} {by:.1f})"><ellipse cx="{bx:.1f}" cy="{by:.1f}" rx="12.5" ry="16.5" fill="url(#chromeV)" stroke="#77797b" stroke-width=".8"/>'
+        f'<ellipse cx="{bx - 3:.1f}" cy="{by - 5:.1f}" rx="5" ry="6" fill="#fff" fill-opacity=".75"/></g>')
+add('<rect x="397.5" y="741" width="9" height="9" fill="#9a9c9e"/><ellipse cx="402" cy="741.5" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>')
+add('<rect x="533" y="1414" width="9" height="9" fill="#9a9c9e"/><ellipse cx="537.5" cy="1425.5" rx="11" ry="4.6" fill="url(#chromeV)" stroke="#77797b" stroke-width=".6"/>')
+add('<use xlink:href="#body" fill="url(#butter)"/>')
+add('<use xlink:href="#neck" fill="url(#maple)"/>')
+add('<use xlink:href="#head" fill="url(#headMaple)"/>')
 add('</g>')
 
-# ---- body paint: highlight, metal flake, rolled edge, travelling sheen
+# ---------------------------------------------------------------- body: grain, rolled edge, gloss
 add('<g clip-path="url(#bodyClip)">')
-add('<rect x="-200" y="-170" width="400" height="340" fill="url(#goldHi)"/>')
-add('<rect x="-200" y="-170" width="400" height="340" filter="url(#flakeDark)" opacity=".4"/>')
-add('<rect x="-200" y="-170" width="400" height="340" filter="url(#flake)" opacity=".55"/>')
-add(f'<path d="{body_d}" fill="none" stroke="#8a4600" stroke-opacity=".55" stroke-width="11" filter="url(#blur3)"/>')
-add(f'<path d="{body_d}" fill="none" stroke="#ffe08a" stroke-opacity=".55" stroke-width="2.2" transform="translate(1.2 1.6)" filter="url(#blur1)"/>')
-add('<g transform="rotate(20)"><rect class="sheen" x="-70" y="-260" width="140" height="520" fill="url(#sheen)"/></g>')
-for _ in range(16):                                             # twinkling flakes
-    x, y = random.uniform(-180, 5), random.uniform(-150, 150)
-    if abs(y) < 45 and x > -80 or (y < -70 and -125 < x):
-        continue
-    r = random.uniform(2.2, 4.2)
-    add(f'<path class="tw" style="animation-delay:-{random.uniform(0, 2.4):.2f}s;animation-duration:{random.uniform(1.8, 3.4):.2f}s" '
-        f'd="M{x:.1f} {y - r:.1f} L{x + r * .22:.1f} {y - r * .22:.1f} L{x + r:.1f} {y:.1f} L{x + r * .22:.1f} {y + r * .22:.1f} L{x:.1f} {y + r:.1f} L{x - r * .22:.1f} {y + r * .22:.1f} L{x - r:.1f} {y:.1f} L{x - r * .22:.1f} {y - r * .22:.1f} Z" fill="#fff8dc"/>')
+for i in range(22):
+    x = 275 + i * 24 + random.uniform(-8, 8)
+    w1, w2 = random.uniform(-7, 7), random.uniform(-7, 7)
+    add(f'<path d="M{x:.0f} 730 C{x + w1:.0f} 960 {x + w2:.0f} 1200 {x + random.uniform(-5, 5):.0f} 1440" fill="none" stroke="#d6921a" stroke-opacity="{random.uniform(.08, .2):.2f}" stroke-width="{random.uniform(.8, 2.6):.1f}"/>')
+add('<use xlink:href="#body" fill="none" stroke="#c97f10" stroke-opacity=".55" stroke-width="26" filter="url(#b5)" transform="translate(-9 -6)"/>')
+add('<use xlink:href="#body" fill="none" stroke="#ffe9a6" stroke-opacity=".75" stroke-width="5" filter="url(#b2)" transform="translate(10 7)"/>')
+add('<use xlink:href="#body" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.6" filter="url(#b1)" transform="translate(9 6)"/>')
+add('<g transform="rotate(22 528 1090)"><rect class="sheen" x="478" y="640" width="100" height="900" fill="url(#sheen)"/></g>')
 add('</g>')
-add(f'<path d="{body_d}" fill="none" stroke="#5e2f00" stroke-opacity=".8" stroke-width=".8"/>')
+add('<use xlink:href="#body" fill="none" stroke="#bf7d12" stroke-opacity=".7" stroke-width="1"/>')
 
-# ---- control plate, knobs, selector
-add('<g filter="url(#small)"><rect x="-136.5" y="74.5" width="161" height="33" rx="16.5" fill="url(#black)" stroke="#4a4c53" stroke-width=".6"/></g>')
-add('<rect x="-131" y="77" width="150" height="1.2" rx=".6" fill="#fff" fill-opacity=".22"/>')
-for x in (-114, -52):
-    add(f'<g filter="url(#small)"><circle cx="{x}" cy="91" r="10.4" fill="#08080a" stroke="#2c2e33" stroke-width="2" stroke-dasharray="1 1.1"/>'
-        f'<circle cx="{x}" cy="91" r="8.6" fill="url(#knob)"/><circle cx="{x}" cy="91" r="8.6" fill="none" stroke="#6c7078" stroke-opacity=".5" stroke-width=".5"/></g>')
-add('<rect x="-18" y="89.6" width="30" height="2.8" rx="1.4" fill="#000"/>'
-    '<g filter="url(#small)"><path d="M-3 91 L7 84" stroke="#b9bdc6" stroke-width="1.6" stroke-linecap="round"/><ellipse cx="8" cy="83.4" rx="4.6" ry="3.4" fill="#0b0b0d" stroke="#3a3c42" stroke-width=".5"/></g>')
-for x in (-128, 16):
-    add(f'<circle cx="{x}" cy="91" r="1.7" fill="#000" stroke="#55585f" stroke-width=".4"/>')
+# ---------------------------------------------------------------- pickguard
+add('<g filter="url(#lift)"><use xlink:href="#guard" fill="url(#guardFill)"/></g>')
+add('<g clip-path="url(#guardClip)"><use xlink:href="#guard" fill="none" stroke="#fff" stroke-width="3" transform="translate(1.5 1.5)"/>'
+    '<use xlink:href="#guard" fill="none" stroke="#bdb8aa" stroke-opacity=".8" stroke-width="2.4" transform="translate(-1 -1)"/></g>')
+add('<use xlink:href="#guard" fill="none" stroke="#a8a394" stroke-opacity=".7" stroke-width=".8"/>')
+for x, y in [(710, 793), (473, 823), (588, 884), (415, 933), (710, 910), (420, 1063), (621, 1063), (708, 1063)]:
+    screw(x, y)
 
-# ---- bridge plate, bridge pickup, brass saddles
-add('<g filter="url(#small)"><rect x="-76" y="-40" width="94" height="79" rx="2.5" fill="url(#black)" stroke="#4a4c53" stroke-width=".6"/></g>')
-add('<rect x="-74" y="-38.4" width="90" height="1.1" fill="#fff" fill-opacity=".2"/>')
-for x, y in [(-72, 35), (-72, -35), (14, 35), (14, -35)]:
-    add(f'<circle cx="{x}" cy="{y}" r="1.7" fill="#000" stroke="#55585f" stroke-width=".4"/>')
-add('<g transform="rotate(8 -5 0)"><rect x="-14" y="-35" width="18" height="70" rx="4" fill="#050506" stroke="#2e3035" stroke-width=".7"/>')
-for i in range(6):
-    add(f'<circle class="pole" style="animation-delay:{i * .07:.2f}s" cx="-5" cy="{-26.25 + i * 10.5:.2f}" r="2.1" fill="#cdbf8e"/>')
-add('</g>')
-for i in range(6):
-    y = -26.25 + i * 10.5
-    add(f'<rect x="-61" y="{y - 4.6:.2f}" width="14" height="9.2" rx="1.2" fill="url(#brass)" stroke="#6d4d10" stroke-width=".4"/>'
-        f'<circle cx="-66" cy="{y:.2f}" r="1.5" fill="#1a1a1d"/><rect x="-72" y="{y - .7:.2f}" width="7" height="1.4" fill="#2b2c31"/>')
-
-# ---- pickguard: dark brushed aluminium
-add(f'<g filter="url(#small)"><path d="{guard_d}" fill="url(#guard)"/></g>')
-add(f'<g clip-path="url(#guardClip)"><rect x="0" y="-130" width="190" height="220" fill="url(#brush)"/>'
-    f'<rect x="60" y="-130" width="46" height="220" fill="#fff" fill-opacity=".06" transform="skewX(-18)" filter="url(#blur3)"/></g>')
-add(f'<path d="{guard_d}" fill="none" stroke="#9a9ea7" stroke-opacity=".55" stroke-width=".7"/>')
-for x, y in [(160, 46), (130, 74), (66, 76), (18, 74), (17, 8), (17, -60), (17, -110), (70, -117), (128, -118), (166, -112), (134, -84), (126, -48)]:
-    add(f'<circle cx="{x}" cy="{-y}" r="2" fill="#0a0a0c" stroke="#6a6d75" stroke-width=".4"/><path d="M{x - 1.1} {-y} h2.2 M{x} {-y - 1.1} v2.2" stroke="#4b4e55" stroke-width=".4"/>')
-
-# ---- neck pickup: champagne cover
-add('<g filter="url(#small)"><rect x="102" y="-35" width="18" height="70" rx="8" fill="url(#champ)" stroke="#7a6c40" stroke-width=".5"/></g>')
-add('<rect x="105" y="-31" width="12" height="62" rx="5.5" fill="none" stroke="#fffbe6" stroke-opacity=".7" stroke-width=".6"/>')
-for y in (-39.5, 39.5):
-    add(f'<circle cx="111" cy="{y}" r="1.6" fill="#0a0a0c" stroke="#6a6d75" stroke-width=".4"/>')
-
-# ---- ebony fretboard, frets, bar inlays, nut
-add(f'<path d="{fb_d}" fill="url(#ebony)"/>')
-add(f'<path d="M{FB_END} {-half_w(FB_END) + 1.2:.1f} L{NUT} {-half_w(NUT) + 1.2:.1f}" stroke="#fff" stroke-opacity=".10" stroke-width="1"/>')
-for nfr in (3, 5, 7, 9, 12, 15, 17, 19, 21):
-    x = (fret(nfr) + fret(nfr - 1)) / 2
-    hh = 15 if nfr == 12 else 6.5
-    add(f'<rect x="{x - 1.9:.1f}" y="{-hh}" width="3.8" height="{2 * hh}" rx=".5" fill="#f3f0e8"/>')
-for nfr in range(1, 23):
-    x = fret(nfr)
-    add(f'<rect x="{x - 1.1:.1f}" y="{-half_w(x) + .3:.1f}" width="2.2" height="{2 * half_w(x) - .6:.1f}" fill="url(#fretm)"/>')
-add(f'<rect x="{NUT - .5}" y="{-half_w(NUT) - .4:.1f}" width="3.4" height="{2 * half_w(NUT) + .8:.1f}" rx=".6" fill="#f4eedd"/>')
-
-# ---- headstock: grain, tuner posts, string tree, name decal
-add('<g clip-path="url(#headClip)">')
+# ---------------------------------------------------------------- neck: maple board, frets, dots, nut
+add('<g filter="url(#lift)"><use xlink:href="#neck" fill="url(#maple)"/></g>')   # over the pickguard and the neck pocket
+add('<g clip-path="url(#neckClip)">')
 for i in range(7):
-    y = -40 + i * 11 + random.uniform(-2, 2)
-    add(f'<path d="M590 {y:.1f} C650 {y - 5:.1f} 720 {y + 5:.1f} 790 {y - 2:.1f}" fill="none" stroke="#8a5f28" stroke-opacity=".16" stroke-width="{random.uniform(.6, 1.6):.1f}"/>')
-add(f'<path d="{head_d}" fill="none" stroke="#fff3d2" stroke-opacity=".5" stroke-width="2" transform="translate(-.8 1.4)" filter="url(#blur1)"/>')
+    x = CX - 36 + i * 12 + random.uniform(-3, 3)
+    add(f'<path d="M{x:.0f} 230 C{x + random.uniform(-3, 3):.0f} 460 {x + random.uniform(-3, 3):.0f} 700 {x + random.uniform(-4, 4):.0f} 905" fill="none" stroke="#c98f2a" stroke-opacity="{random.uniform(.08, .18):.2f}" stroke-width="{random.uniform(.7, 1.8):.1f}"/>')
 add('</g>')
-add(f'<path d="{head_d}" fill="none" stroke="#7d5722" stroke-opacity=".8" stroke-width=".7"/>')
-for x, y in POSTS:
-    add(f'<g filter="url(#small)"><circle cx="{x}" cy="{-y}" r="5.4" fill="url(#black)" stroke="#55585f" stroke-width=".5"/></g>'
-        f'<circle cx="{x}" cy="{-y}" r="2.9" fill="url(#knob)"/><circle cx="{x}" cy="{-y}" r=".9" fill="#000"/>')
-add('<g filter="url(#small)"><circle cx="668" cy="-2" r="2.6" fill="url(#knob)" stroke="#55585f" stroke-width=".4"/></g>')
-add('<text x="706" y="17" text-anchor="middle" font-family="\'Snell Roundhand\', \'Brush Script MT\', \'Segoe Script\', cursive" font-style="italic" font-weight="700" font-size="12" fill="#2a1a08" fill-opacity=".85">jo-jordan</text>')
+add('<use xlink:href="#neck" fill="none" stroke="#b9801c" stroke-opacity=".75" stroke-width="1"/>')
+for n in (3, 5, 7, 9, 15, 17, 19, 21):
+    add(f'<circle cx="{CX}" cy="{(fret(n) + fret(n - 1)) / 2:.1f}" r="{5 if n < 21 else 4.4}" fill="#15130f"/>')
+y12 = (fret(12) + fret(11)) / 2
+add(f'<circle cx="{CX - 15}" cy="{y12:.1f}" r="5" fill="#15130f"/><circle cx="{CX + 15}" cy="{y12:.1f}" r="5" fill="#15130f"/>')
+for n in range(1, 22):
+    y, w = fret(n), half_w(fret(n))
+    add(f'<rect x="{CX - w + .6:.1f}" y="{y + 1.2:.1f}" width="{2 * w - 1.2:.1f}" height="1.6" fill="#7a5a12" fill-opacity=".35"/>'
+        f'<rect x="{CX - w + .4:.1f}" y="{y - 1.5:.1f}" width="{2 * w - .8:.1f}" height="3" rx="1" fill="url(#fretm)"/>')
+add(f'<rect x="{CX - half_w(NUT) - .5:.1f}" y="{NUT - 5}" width="{2 * half_w(NUT) + 1:.1f}" height="9" rx="1.5" fill="#f7f3e6" stroke="#b9b29c" stroke-width=".6"/>'
+    f'<rect x="{CX - half_w(NUT):.1f}" y="{NUT + 4}" width="{2 * half_w(NUT):.1f}" height="2.5" fill="#7a5a12" fill-opacity=".3"/>')
 
-# ---- strings: saddle -> nut -> tuner post, low E on top
-gauge = [1.5, 1.3, 1.1, .85, .7, .6]
+# ---------------------------------------------------------------- headstock: grain, gloss, tuner posts
+add('<g clip-path="url(#headClip)">')
+for i in range(8):
+    x = 470 + i * 15 + random.uniform(-3, 3)
+    add(f'<path d="M{x:.0f} 240 C{x + 14:.0f} 150 {x + 30:.0f} 60 {x + 44:.0f} -30" fill="none" stroke="#c98f2a" stroke-opacity="{random.uniform(.08, .2):.2f}" stroke-width="{random.uniform(.7, 1.8):.1f}"/>')
+add('<use xlink:href="#head" fill="none" stroke="#c98a22" stroke-opacity=".5" stroke-width="12" filter="url(#b2)" transform="translate(-4 -3)"/>')
+add('<use xlink:href="#head" fill="none" stroke="#fff6d8" stroke-opacity=".85" stroke-width="3.5" filter="url(#b2)" transform="translate(4 4)"/>')
+add('</g>')
+add('<use xlink:href="#head" fill="none" stroke="#b9801c" stroke-opacity=".75" stroke-width="1"/>')
+for x, y in POSTS:
+    add(f'<g filter="url(#lift)"><circle cx="{x:.1f}" cy="{y}" r="11.5" fill="url(#chromeH)" stroke="#6f7173" stroke-width=".7"/></g>'
+        f'<circle cx="{x:.1f}" cy="{y}" r="8" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1"/>'
+        f'<circle cx="{x:.1f}" cy="{y}" r="6.2" fill="url(#dome)" stroke="#6f7173" stroke-width=".6"/>')
+
+# ---------------------------------------------------------------- neck pickup
+add('<g filter="url(#lift)"><rect x="472" y="907" width="118" height="24" rx="10" fill="url(#chromeV)" stroke="#77797b" stroke-width=".8"/></g>')
+add('<rect x="479" y="910.5" width="104" height="4" rx="2" fill="#fff" fill-opacity=".85"/>')
+
+# ---------------------------------------------------------------- bridge: plate, pickup, three barrel saddles
+add('<g filter="url(#lift)"><rect x="462.5" y="1057" width="136" height="162" rx="6" fill="url(#plate)" stroke="#808284" stroke-width=".9"/></g>')
+add('<rect x="468.5" y="1061" width="124" height="151" rx="3" fill="url(#plateIn)" stroke="#fff" stroke-opacity=".8" stroke-width="1.2"/>')
+add('<path d="M468.5 1212 V1064 a3 3 0 0 1 3 -3 H590" fill="none" stroke="#8c8e90" stroke-opacity=".7" stroke-width="1"/>')
+add('<g transform="rotate(18.3 530 1100)"><rect x="465" y="1083" width="130" height="34" rx="17" fill="url(#pickup)" stroke="#000" stroke-width=".6"/>'
+    '<rect x="476" y="1086" width="108" height="3" rx="1.5" fill="#fff" fill-opacity=".14"/>')
 for i in range(6):
-    ax, ay = SADDLE + 5, -(26.25 - 10.5 * i)
-    bx, by = NUT, -(17.5 - 7 * i)
-    px, py = POSTS[i][0], -POSTS[i][1]
-    col = "#d9c9a2" if i < 3 else "#eef0f4"
-    add(f'<path d="M{ax} {ay:.2f} L{bx} {by:.2f} L{px} {py + 2.6:.1f}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="{gauge[i]}" transform="translate(0 1.3)"/>')
-    add(f'<path d="M{ax} {ay:.2f} L{bx} {by:.2f} L{px} {py + 2.6:.1f}" fill="none" stroke="{col}" stroke-width="{gauge[i]}"/>')
+    add(f'<circle cx="{484.4 + i * 18.24:.1f}" cy="1100" r="4.6" fill="url(#dome)" stroke="#55575a" stroke-width=".5"/>')
+add('</g>')
+for x, y in [(535, 1075), (487.7, 1112.7), (557.7, 1135.7)]:
+    screw(x, y, 3.8)
+for k in range(3):
+    cx = (STR_SADDLE[2 * k] + STR_SADDLE[2 * k + 1]) / 2
+    zig = " ".join(f"L{cx + (4.2 if j % 2 else -4.2):.1f} {1184 + j * 2.6:.1f}" for j in range(11))
+    add(f'<rect x="{cx - 1.6:.1f}" y="1180" width="3.2" height="40" fill="#8b8d8f"/>'
+        f'<path d="M{cx:.1f} 1182 {zig}" fill="none" stroke="#6d6f71" stroke-width="1.7" stroke-linejoin="round"/>'
+        f'<path d="M{cx - .8:.1f} 1182 {zig}" fill="none" stroke="#f2f2f2" stroke-opacity=".6" stroke-width=".6" transform="translate(-.6 -.5)"/>'
+        f'<rect x="{cx - 4.5:.1f}" y="1217" width="9" height="6" rx="2" fill="url(#chromeH)" stroke="#6f7173" stroke-width=".5"/>')
+    add(f'<g filter="url(#lift)"><rect x="{cx - 16.2:.1f}" y="1165" width="32.4" height="16" rx="5" fill="url(#chromeV)" stroke="#6f7173" stroke-width=".6"/></g>'
+        f'<circle cx="{cx - 11.5:.1f}" cy="1173" r="1.7" fill="#1c1c1d"/><circle cx="{cx + 11.5:.1f}" cy="1173" r="1.7" fill="#1c1c1d"/>')
+for x in (474.5, 514.5, 548.5, 586.5):
+    screw(x, 1200, 3.6)
+
+# ---------------------------------------------------------------- control plate: selector and two knobs
+add('<g filter="url(#lift)"><rect x="646" y="1042" width="55" height="273" rx="27.5" fill="url(#plate)" stroke="#808284" stroke-width=".9"/></g>')
+add('<rect x="649.5" y="1045.5" width="48" height="266" rx="24" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="1.2"/>')
+for y in (1053, 1136, 1304):
+    screw(673.3, y, 3.6)
+add('<rect x="671.6" y="1079" width="3.6" height="46" rx="1.8" fill="#101011"/>')
+add('<g filter="url(#lift)"><rect x="664.5" y="1087" width="18" height="25" rx="5" fill="url(#pickup)" stroke="#000" stroke-width=".5"/></g><rect x="667" y="1089.5" width="13" height="3" rx="1.5" fill="#fff" fill-opacity=".25"/>')
+for cy in (1171.5, 1266.5):
+    cx = 675.5
+    add(f'<ellipse cx="{cx}" cy="{cy + 5}" rx="21" ry="20" fill="#000" fill-opacity=".28" filter="url(#b2)"/>'
+        f'<circle cx="{cx}" cy="{cy}" r="20" fill="#8d8f91" stroke="#5f6163" stroke-width=".7"/>'
+        f'<circle cx="{cx}" cy="{cy}" r="19" fill="none" stroke="#e9e9e9" stroke-width="2.4" stroke-dasharray="1.1 1.4"/>'
+        f'<circle cx="{cx}" cy="{cy - 1.5}" r="16" fill="url(#knobTop)" stroke="#7b7d7f" stroke-width=".6"/>'
+        f'<path d="M{cx} {cy - 1.5} L{cx - 6} {cy - 17.2} A16 16 0 0 1 {cx + 6} {cy - 17.2} Z M{cx} {cy - 1.5} L{cx + 6} {cy + 14.2} A16 16 0 0 1 {cx - 6} {cy + 14.2} Z" fill="#fff" fill-opacity=".55"/>'
+        f'<path d="M{cx} {cy - 1.5} L{cx - 15.7} {cy - 5} A16 16 0 0 0 {cx - 15.7} {cy + 2} Z M{cx} {cy - 1.5} L{cx + 15.7} {cy - 5} A16 16 0 0 1 {cx + 15.7} {cy + 2} Z" fill="#6d6f71" fill-opacity=".28"/>')
+
+# ---------------------------------------------------------------- strings: saddle -> nut -> tuner post
 for i in range(6):
-    ax, ay = SADDLE + 5, -(26.25 - 10.5 * i)
-    bx, by = NUT, -(17.5 - 7 * i)
+    px, py = POSTS[i]
+    d = f"M{STR_SADDLE[i]:.1f} {SADDLE} L{STR_NUT[i]:.1f} {NUT} L{px:.1f} {py}"
+    add(f'<path d="{d}" fill="none" stroke="#3a2a00" stroke-opacity=".28" stroke-width="{GAUGE[i]}" transform="translate(2 1.5)"/>'
+        f'<path d="{d}" fill="none" stroke="#8e8e8b" stroke-width="{GAUGE[i]}" stroke-linejoin="round"/>'
+        f'<path d="{d}" fill="none" stroke="#f4f4f2" stroke-opacity=".8" stroke-width="{GAUGE[i] * .35:.2f}" transform="translate(-.4 0)"/>')
+for i in range(6):
+    ax, ay, bx, by = STR_SADDLE[i], SADDLE, STR_NUT[i], NUT
     length, ang = math.hypot(bx - ax, by - ay), math.degrees(math.atan2(by - ay, bx - ax))
-    amp = 3.4 - i * .32
-    d = f"{i * .07:.2f}s"
-    add(f'<g transform="translate({ax} {ay:.2f}) rotate({ang:.3f})">'
-        f'<path class="lens" style="animation-delay:{d}" d="M0 0 Q{length / 2:.1f} {-2 * amp:.2f} {length:.1f} 0 Q{length / 2:.1f} {2 * amp:.2f} 0 0 Z" fill="#ffd978" fill-opacity=".5"/>'
-        f'<g class="wave" style="animation-delay:{d}"><path d="M0 0 Q{length / 2:.1f} {-2 * amp:.2f} {length:.1f} 0" fill="none" stroke="#fff6d6" stroke-width="{gauge[i] + .5:.2f}"/>'
+    amp = 4.6 - i * .42
+    dl = f"{i * .06:.2f}s"
+    add(f'<g transform="translate({ax:.1f} {ay}) rotate({ang:.3f})">'
+        f'<path class="lens" style="animation-delay:{dl}" d="M0 0 Q{length / 2:.1f} {-2 * amp:.2f} {length:.1f} 0 Q{length / 2:.1f} {2 * amp:.2f} 0 0 Z" fill="#77776f" fill-opacity=".3"/>'
+        f'<g class="wave" style="animation-delay:{dl}"><path d="M0 0 Q{length / 2:.1f} {-2 * amp:.2f} {length:.1f} 0" fill="none" stroke="#6f6f6b" stroke-width="{GAUGE[i]:.2f}"/>'
         f'<path d="M0 0 Q{length / 2:.1f} {2 * amp:.2f} {length:.1f} 0" fill="none" stroke="none"/></g></g>')
 
-add('</g></g></svg>')
+# ---------------------------------------------------------------- chrome glints
+glint(POSTS[5][0] - 42, POSTS[5][1] - 20, 13, 0)
+glint(469, 1062, 11, 1.4)
+glint(668, 1161, 12, 2.6)
+
+add('</g></svg>')
 open(sys.argv[1], "w", encoding="utf-8").write("\n".join(o) + "\n")
